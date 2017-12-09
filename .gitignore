@@ -8,3 +8,5 @@
 *.cache
 *.Cache
 *.exe
+.vs/FileMan/v15/sqlite3/storage.ide
+.vs/FileMan/v15/sqlite3/storage.ide
