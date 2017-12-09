@@ -35,9 +35,9 @@
             this.toTimePortionDateTimePicker = new System.Windows.Forms.DateTimePicker();
             this.fromLabel = new System.Windows.Forms.Label();
             this.toLabel = new System.Windows.Forms.Label();
-            this.SearchConditionsPanel = new System.Windows.Forms.Panel();
             this.searchConditionsPanelLabel = new System.Windows.Forms.Label();
             this.searchCueTextBox = new CueTextBox();
+            this.warningLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // Searchbutton
@@ -100,13 +100,6 @@
             this.toLabel.TabIndex = 7;
             this.toLabel.Text = "To";
             // 
-            // SearchConditionsPanel
-            // 
-            this.SearchConditionsPanel.Location = new System.Drawing.Point(23, 228);
-            this.SearchConditionsPanel.Name = "SearchConditionsPanel";
-            this.SearchConditionsPanel.Size = new System.Drawing.Size(325, 283);
-            this.SearchConditionsPanel.TabIndex = 8;
-            // 
             // searchConditionsPanelLabel
             // 
             this.searchConditionsPanelLabel.AutoSize = true;
@@ -125,13 +118,21 @@
             this.searchCueTextBox.TabIndex = 0;
             this.searchCueTextBox.TextChanged += new System.EventHandler(this.cueTextBox1_TextChanged);
             // 
+            // warningLabel
+            // 
+            this.warningLabel.AutoSize = true;
+            this.warningLabel.Location = new System.Drawing.Point(23, 148);
+            this.warningLabel.Name = "warningLabel";
+            this.warningLabel.Size = new System.Drawing.Size(0, 13);
+            this.warningLabel.TabIndex = 10;
+            // 
             // mainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1204, 523);
+            this.Controls.Add(this.warningLabel);
             this.Controls.Add(this.searchConditionsPanelLabel);
-            this.Controls.Add(this.SearchConditionsPanel);
             this.Controls.Add(this.toLabel);
             this.Controls.Add(this.fromLabel);
             this.Controls.Add(this.toTimePortionDateTimePicker);
@@ -142,6 +143,7 @@
             this.Controls.Add(this.searchCueTextBox);
             this.Name = "mainForm";
             this.Text = "File Management Tool";
+            this.Load += new System.EventHandler(this.mainForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -157,8 +159,8 @@
         private System.Windows.Forms.DateTimePicker toTimePortionDateTimePicker;
         private System.Windows.Forms.Label fromLabel;
         private System.Windows.Forms.Label toLabel;
-        private System.Windows.Forms.Panel SearchConditionsPanel;
         private System.Windows.Forms.Label searchConditionsPanelLabel;
+        private System.Windows.Forms.Label warningLabel;
     }
 }
 
