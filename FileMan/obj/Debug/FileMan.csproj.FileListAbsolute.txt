@@ -1,0 +1,11 @@
+C:\Users\28153\source\repos\FileMan\FileMan\bin\Debug\FileMan.exe.config
+C:\Users\28153\source\repos\FileMan\FileMan\bin\Debug\FileMan.exe
+C:\Users\28153\source\repos\FileMan\FileMan\bin\Debug\FileMan.pdb
+C:\Users\28153\source\repos\FileMan\FileMan\obj\Debug\FileMan.csprojResolveAssemblyReference.cache
+C:\Users\28153\source\repos\FileMan\FileMan\obj\Debug\FileMan.Properties.Resources.resources
+C:\Users\28153\source\repos\FileMan\FileMan\obj\Debug\FileMan.csproj.GenerateResource.Cache
+C:\Users\28153\source\repos\FileMan\FileMan\obj\Debug\FileMan.csproj.CoreCompileInputs.cache
+C:\Users\28153\source\repos\FileMan\FileMan\obj\Debug\FileMan.exe
+C:\Users\28153\source\repos\FileMan\FileMan\obj\Debug\FileMan.pdb
+C:\Users\28153\source\repos\FileMan\FileMan\bin\Debug\TestControl.dll
+C:\Users\28153\source\repos\FileMan\FileMan\obj\Debug\FileMan.mainForm.resources
