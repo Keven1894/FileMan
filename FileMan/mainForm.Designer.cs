@@ -36,8 +36,15 @@
             this.fromLabel = new System.Windows.Forms.Label();
             this.toLabel = new System.Windows.Forms.Label();
             this.searchConditionsPanelLabel = new System.Windows.Forms.Label();
-            this.searchCueTextBox = new CueTextBox();
             this.warningLabel = new System.Windows.Forms.Label();
+            this.searchResultGroupBox = new System.Windows.Forms.GroupBox();
+            this.searchResultTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
+            this.updatedFolderNumberButton = new System.Windows.Forms.Button();
+            this.DescriptionLabel2 = new System.Windows.Forms.Label();
+            this.descriptionLabel1 = new System.Windows.Forms.Label();
+            this.updatedFilesNumberButton = new System.Windows.Forms.Button();
+            this.searchCueTextBox = new CueTextBox();
+            this.searchResultGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
             // Searchbutton
@@ -109,6 +116,83 @@
             this.searchConditionsPanelLabel.TabIndex = 9;
             this.searchConditionsPanelLabel.Text = "Search Conditions: (Click to Remove Search Condition)";
             // 
+            // warningLabel
+            // 
+            this.warningLabel.AutoSize = true;
+            this.warningLabel.Location = new System.Drawing.Point(23, 148);
+            this.warningLabel.Name = "warningLabel";
+            this.warningLabel.Size = new System.Drawing.Size(0, 13);
+            this.warningLabel.TabIndex = 10;
+            // 
+            // searchResultGroupBox
+            // 
+            this.searchResultGroupBox.BackColor = System.Drawing.SystemColors.Control;
+            this.searchResultGroupBox.Controls.Add(this.searchResultTableLayoutPanel);
+            this.searchResultGroupBox.Controls.Add(this.updatedFolderNumberButton);
+            this.searchResultGroupBox.Controls.Add(this.DescriptionLabel2);
+            this.searchResultGroupBox.Controls.Add(this.descriptionLabel1);
+            this.searchResultGroupBox.Controls.Add(this.updatedFilesNumberButton);
+            this.searchResultGroupBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.searchResultGroupBox.Location = new System.Drawing.Point(420, 12);
+            this.searchResultGroupBox.Name = "searchResultGroupBox";
+            this.searchResultGroupBox.Size = new System.Drawing.Size(735, 484);
+            this.searchResultGroupBox.TabIndex = 11;
+            this.searchResultGroupBox.TabStop = false;
+            this.searchResultGroupBox.Text = "Search Result";
+            // 
+            // searchResultTableLayoutPanel
+            // 
+            this.searchResultTableLayoutPanel.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
+            this.searchResultTableLayoutPanel.ColumnCount = 2;
+            this.searchResultTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.searchResultTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.searchResultTableLayoutPanel.Location = new System.Drawing.Point(6, 161);
+            this.searchResultTableLayoutPanel.Name = "searchResultTableLayoutPanel";
+            this.searchResultTableLayoutPanel.RowCount = 2;
+            this.searchResultTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.searchResultTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.searchResultTableLayoutPanel.Size = new System.Drawing.Size(723, 317);
+            this.searchResultTableLayoutPanel.TabIndex = 12;
+            this.searchResultTableLayoutPanel.CellPaint += new System.Windows.Forms.TableLayoutCellPaintEventHandler(this.searchResultTableLayoutPanel_CellPaint);
+            // 
+            // updatedFolderNumberButton
+            // 
+            this.updatedFolderNumberButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.updatedFolderNumberButton.Location = new System.Drawing.Point(182, 30);
+            this.updatedFolderNumberButton.Name = "updatedFolderNumberButton";
+            this.updatedFolderNumberButton.Size = new System.Drawing.Size(75, 23);
+            this.updatedFolderNumberButton.TabIndex = 3;
+            this.updatedFolderNumberButton.Text = "updatedFolderNumberButton";
+            this.updatedFolderNumberButton.UseVisualStyleBackColor = true;
+            // 
+            // DescriptionLabel2
+            // 
+            this.DescriptionLabel2.AutoSize = true;
+            this.DescriptionLabel2.Location = new System.Drawing.Point(154, 36);
+            this.DescriptionLabel2.Name = "DescriptionLabel2";
+            this.DescriptionLabel2.Size = new System.Drawing.Size(31, 13);
+            this.DescriptionLabel2.TabIndex = 2;
+            this.DescriptionLabel2.Text = "files, ";
+            // 
+            // descriptionLabel1
+            // 
+            this.descriptionLabel1.AutoSize = true;
+            this.descriptionLabel1.Location = new System.Drawing.Point(17, 35);
+            this.descriptionLabel1.Name = "descriptionLabel1";
+            this.descriptionLabel1.Size = new System.Drawing.Size(53, 13);
+            this.descriptionLabel1.TabIndex = 1;
+            this.descriptionLabel1.Text = "There are";
+            // 
+            // updatedFilesNumberButton
+            // 
+            this.updatedFilesNumberButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.updatedFilesNumberButton.Location = new System.Drawing.Point(63, 30);
+            this.updatedFilesNumberButton.Name = "updatedFilesNumberButton";
+            this.updatedFilesNumberButton.Size = new System.Drawing.Size(75, 23);
+            this.updatedFilesNumberButton.TabIndex = 0;
+            this.updatedFilesNumberButton.Text = "updatedFilesNumberButton";
+            this.updatedFilesNumberButton.UseVisualStyleBackColor = true;
+            // 
             // searchCueTextBox
             // 
             this.searchCueTextBox.Cue = "Search File";
@@ -118,19 +202,12 @@
             this.searchCueTextBox.TabIndex = 0;
             this.searchCueTextBox.TextChanged += new System.EventHandler(this.cueTextBox1_TextChanged);
             // 
-            // warningLabel
-            // 
-            this.warningLabel.AutoSize = true;
-            this.warningLabel.Location = new System.Drawing.Point(23, 148);
-            this.warningLabel.Name = "warningLabel";
-            this.warningLabel.Size = new System.Drawing.Size(0, 13);
-            this.warningLabel.TabIndex = 10;
-            // 
             // mainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1204, 523);
+            this.Controls.Add(this.searchResultGroupBox);
             this.Controls.Add(this.warningLabel);
             this.Controls.Add(this.searchConditionsPanelLabel);
             this.Controls.Add(this.toLabel);
@@ -144,6 +221,8 @@
             this.Name = "mainForm";
             this.Text = "File Management Tool";
             this.Load += new System.EventHandler(this.mainForm_Load);
+            this.searchResultGroupBox.ResumeLayout(false);
+            this.searchResultGroupBox.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -161,6 +240,12 @@
         private System.Windows.Forms.Label toLabel;
         private System.Windows.Forms.Label searchConditionsPanelLabel;
         private System.Windows.Forms.Label warningLabel;
+        private System.Windows.Forms.GroupBox searchResultGroupBox;
+        private System.Windows.Forms.Button updatedFilesNumberButton;
+        private System.Windows.Forms.Label descriptionLabel1;
+        private System.Windows.Forms.Button updatedFolderNumberButton;
+        private System.Windows.Forms.Label DescriptionLabel2;
+        private System.Windows.Forms.TableLayoutPanel searchResultTableLayoutPanel;
     }
 }
 
