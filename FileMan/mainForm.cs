@@ -105,16 +105,6 @@ namespace FileMan
             //show the mainForm search part and result part.
             this.Size = new Size(1220, 562);
 
-            //to clear search result tablelayoutPanel
-            searchResultTableLayoutPanel.Controls.Clear();
-            searchResultTableLayoutPanel.RowStyles.Clear();
-
-            //to set the autoscroll for tablelayoutPanel, need to set autoscroll as false firstly, otherwise table cannot shrink
-            searchResultTableLayoutPanel.AutoScroll = false;
-            searchResultTableLayoutPanel.Size = new Size(723, 317);
-            searchResultTableLayoutPanel.MaximumSize = new Size(723, 317);
-            searchResultTableLayoutPanel.AutoScroll = true;
-
             //check the search key word
             if (searchCueTextBox.Text != "")
             {
@@ -170,7 +160,7 @@ namespace FileMan
 
 
             //fill out the query results table
-            fillTableLayoutPanel(dOTQueriedFiles);
+            fillDataGridView(dOTQueriedFiles);
         }
 
         private List<DOTFile> queryInfoFromXMLInputFile(String XMLInputFileName, String fileNameKeyWord, DateTime fromDateTime, DateTime toDateTime)
@@ -218,24 +208,13 @@ namespace FileMan
             return "";
         }
 
-        private void fillTableLayoutPanel(List<DOTFile> dOTQueriedFiles)
+        private void fillDataGridView(List<DOTFile> dOTQueriedFiles)
         {
-            searchResultTableLayoutPanel.ColumnCount = 2; 
-            searchResultTableLayoutPanel.RowCount = 1;
-            searchResultTableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40F));
-            searchResultTableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30F));
-            searchResultTableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 50F));
-            searchResultTableLayoutPanel.Controls.Add(new Label() { Text = "Modified File's Name", AutoSize = true }, 0, 0);
-            searchResultTableLayoutPanel.Controls.Add(new Label() { Text = "The Located Folder", AutoSize = true }, 1, 0);
-            foreach (var dOTQueriedFile in dOTQueriedFiles)
-            {
-                searchResultTableLayoutPanel.RowCount = searchResultTableLayoutPanel.RowCount + 1;
-                searchResultTableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 50F));
-                //MessageBox.Show(dOTQueriedFile.Name);
-                //AutoSize property has to be true, otherwise the content got cut as unexpected.
-                searchResultTableLayoutPanel.Controls.Add(new Label() { Text = dOTQueriedFile.Name, AutoSize = true }, 0, searchResultTableLayoutPanel.RowCount - 1);
-                searchResultTableLayoutPanel.Controls.Add(new Label() { Text = dOTQueriedFile.ParentFolder, AutoSize = true }, 1, searchResultTableLayoutPanel.RowCount - 1);
-            }
+            var fileNameAndPath = dOTQueriedFiles.Select(i => new { i.Name, i.ParentFolder }).ToArray();
+            dataGridView1.DataSource = fileNameAndPath;
+            //dataGridView1.DataBind();
+
+
         }
 
         //below function is used to change the tableLayoutPanel border color.

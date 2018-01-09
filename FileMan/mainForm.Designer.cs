@@ -29,6 +29,7 @@ namespace FileMan
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.Searchbutton = new System.Windows.Forms.Button();
             this.fromDatePortionDateTimePicker = new System.Windows.Forms.DateTimePicker();
             this.fromTimePortionDateTimePicker = new System.Windows.Forms.DateTimePicker();
@@ -40,13 +41,14 @@ namespace FileMan
             this.warningLabel = new System.Windows.Forms.Label();
             this.searchResultGroupBox = new System.Windows.Forms.GroupBox();
             this.descriptionLabel3 = new System.Windows.Forms.Label();
-            this.searchResultTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.updatedFolderNumberButton = new System.Windows.Forms.Button();
             this.DescriptionLabel2 = new System.Windows.Forms.Label();
             this.descriptionLabel1 = new System.Windows.Forms.Label();
             this.updatedFilesNumberButton = new System.Windows.Forms.Button();
+            this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.searchCueTextBox = new CueTextBox();
             this.searchResultGroupBox.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
             // Searchbutton
@@ -130,7 +132,6 @@ namespace FileMan
             // 
             this.searchResultGroupBox.BackColor = System.Drawing.SystemColors.Control;
             this.searchResultGroupBox.Controls.Add(this.descriptionLabel3);
-            this.searchResultGroupBox.Controls.Add(this.searchResultTableLayoutPanel);
             this.searchResultGroupBox.Controls.Add(this.updatedFolderNumberButton);
             this.searchResultGroupBox.Controls.Add(this.DescriptionLabel2);
             this.searchResultGroupBox.Controls.Add(this.descriptionLabel1);
@@ -152,23 +153,6 @@ namespace FileMan
             this.descriptionLabel3.Size = new System.Drawing.Size(252, 13);
             this.descriptionLabel3.TabIndex = 13;
             this.descriptionLabel3.Text = " folder(s) changed based on the search condition(s).";
-            // 
-            // searchResultTableLayoutPanel
-            // 
-            this.searchResultTableLayoutPanel.AutoScroll = true;
-            this.searchResultTableLayoutPanel.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.OutsetDouble;
-            this.searchResultTableLayoutPanel.ColumnCount = 2;
-            this.searchResultTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.searchResultTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.searchResultTableLayoutPanel.Location = new System.Drawing.Point(6, 161);
-            this.searchResultTableLayoutPanel.Name = "searchResultTableLayoutPanel";
-            this.searchResultTableLayoutPanel.RowCount = 2;
-            this.searchResultTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.searchResultTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.searchResultTableLayoutPanel.Size = new System.Drawing.Size(723, 317);
-            this.searchResultTableLayoutPanel.TabIndex = 12;
-            this.searchResultTableLayoutPanel.CellPaint += new System.Windows.Forms.TableLayoutCellPaintEventHandler(this.searchResultTableLayoutPanel_CellPaint);
-            this.searchResultTableLayoutPanel.MouseClick += new System.Windows.Forms.MouseEventHandler(this.searchResultTableLayoutPanel_MouseClick);
             // 
             // updatedFolderNumberButton
             // 
@@ -209,6 +193,24 @@ namespace FileMan
             this.updatedFilesNumberButton.Text = "updatedFilesNumberButton";
             this.updatedFilesNumberButton.UseVisualStyleBackColor = true;
             // 
+            // dataGridView1
+            // 
+            this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dataGridView1.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
+            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView1.DefaultCellStyle = dataGridViewCellStyle1;
+            this.dataGridView1.Location = new System.Drawing.Point(440, 173);
+            this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.Size = new System.Drawing.Size(694, 332);
+            this.dataGridView1.TabIndex = 14;
+            // 
             // searchCueTextBox
             // 
             this.searchCueTextBox.Cue = "Search File";
@@ -223,6 +225,7 @@ namespace FileMan
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1204, 523);
+            this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.searchResultGroupBox);
             this.Controls.Add(this.warningLabel);
             this.Controls.Add(this.searchConditionsPanelLabel);
@@ -242,6 +245,7 @@ namespace FileMan
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.mainForm_Paint);
             this.searchResultGroupBox.ResumeLayout(false);
             this.searchResultGroupBox.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -264,8 +268,8 @@ namespace FileMan
         private System.Windows.Forms.Label descriptionLabel1;
         private System.Windows.Forms.Button updatedFolderNumberButton;
         private System.Windows.Forms.Label DescriptionLabel2;
-        private System.Windows.Forms.TableLayoutPanel searchResultTableLayoutPanel;
         private System.Windows.Forms.Label descriptionLabel3;
+        private System.Windows.Forms.DataGridView dataGridView1;
     }
 }
 
