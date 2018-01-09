@@ -1,4 +1,5 @@
-﻿namespace FileMan
+﻿
+namespace FileMan
 {
     partial class mainForm
     {
@@ -38,6 +39,7 @@
             this.searchConditionsPanelLabel = new System.Windows.Forms.Label();
             this.warningLabel = new System.Windows.Forms.Label();
             this.searchResultGroupBox = new System.Windows.Forms.GroupBox();
+            this.descriptionLabel3 = new System.Windows.Forms.Label();
             this.searchResultTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.updatedFolderNumberButton = new System.Windows.Forms.Button();
             this.DescriptionLabel2 = new System.Windows.Forms.Label();
@@ -127,6 +129,7 @@
             // searchResultGroupBox
             // 
             this.searchResultGroupBox.BackColor = System.Drawing.SystemColors.Control;
+            this.searchResultGroupBox.Controls.Add(this.descriptionLabel3);
             this.searchResultGroupBox.Controls.Add(this.searchResultTableLayoutPanel);
             this.searchResultGroupBox.Controls.Add(this.updatedFolderNumberButton);
             this.searchResultGroupBox.Controls.Add(this.DescriptionLabel2);
@@ -135,14 +138,25 @@
             this.searchResultGroupBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.searchResultGroupBox.Location = new System.Drawing.Point(420, 12);
             this.searchResultGroupBox.Name = "searchResultGroupBox";
-            this.searchResultGroupBox.Size = new System.Drawing.Size(735, 484);
+            this.searchResultGroupBox.Size = new System.Drawing.Size(735, 499);
             this.searchResultGroupBox.TabIndex = 11;
             this.searchResultGroupBox.TabStop = false;
             this.searchResultGroupBox.Text = "Search Result";
+            this.searchResultGroupBox.Paint += new System.Windows.Forms.PaintEventHandler(this.searchResultGroupBox_Paint);
+            // 
+            // descriptionLabel3
+            // 
+            this.descriptionLabel3.AutoSize = true;
+            this.descriptionLabel3.Location = new System.Drawing.Point(263, 35);
+            this.descriptionLabel3.Name = "descriptionLabel3";
+            this.descriptionLabel3.Size = new System.Drawing.Size(252, 13);
+            this.descriptionLabel3.TabIndex = 13;
+            this.descriptionLabel3.Text = " folder(s) changed based on the search condition(s).";
             // 
             // searchResultTableLayoutPanel
             // 
-            this.searchResultTableLayoutPanel.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
+            this.searchResultTableLayoutPanel.AutoScroll = true;
+            this.searchResultTableLayoutPanel.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.OutsetDouble;
             this.searchResultTableLayoutPanel.ColumnCount = 2;
             this.searchResultTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.searchResultTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
@@ -154,6 +168,7 @@
             this.searchResultTableLayoutPanel.Size = new System.Drawing.Size(723, 317);
             this.searchResultTableLayoutPanel.TabIndex = 12;
             this.searchResultTableLayoutPanel.CellPaint += new System.Windows.Forms.TableLayoutCellPaintEventHandler(this.searchResultTableLayoutPanel_CellPaint);
+            this.searchResultTableLayoutPanel.MouseClick += new System.Windows.Forms.MouseEventHandler(this.searchResultTableLayoutPanel_MouseClick);
             // 
             // updatedFolderNumberButton
             // 
@@ -170,9 +185,10 @@
             this.DescriptionLabel2.AutoSize = true;
             this.DescriptionLabel2.Location = new System.Drawing.Point(154, 36);
             this.DescriptionLabel2.Name = "DescriptionLabel2";
-            this.DescriptionLabel2.Size = new System.Drawing.Size(31, 13);
+            this.DescriptionLabel2.Size = new System.Drawing.Size(40, 13);
             this.DescriptionLabel2.TabIndex = 2;
-            this.DescriptionLabel2.Text = "files, ";
+            this.DescriptionLabel2.Text = " file(s), ";
+            this.DescriptionLabel2.Click += new System.EventHandler(this.DescriptionLabel2_Click);
             // 
             // descriptionLabel1
             // 
@@ -186,7 +202,7 @@
             // updatedFilesNumberButton
             // 
             this.updatedFilesNumberButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.updatedFilesNumberButton.Location = new System.Drawing.Point(63, 30);
+            this.updatedFilesNumberButton.Location = new System.Drawing.Point(70, 30);
             this.updatedFilesNumberButton.Name = "updatedFilesNumberButton";
             this.updatedFilesNumberButton.Size = new System.Drawing.Size(75, 23);
             this.updatedFilesNumberButton.TabIndex = 0;
@@ -218,9 +234,12 @@
             this.Controls.Add(this.fromDatePortionDateTimePicker);
             this.Controls.Add(this.Searchbutton);
             this.Controls.Add(this.searchCueTextBox);
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "mainForm";
             this.Text = "File Management Tool";
             this.Load += new System.EventHandler(this.mainForm_Load);
+            this.Paint += new System.Windows.Forms.PaintEventHandler(this.mainForm_Paint);
             this.searchResultGroupBox.ResumeLayout(false);
             this.searchResultGroupBox.PerformLayout();
             this.ResumeLayout(false);
@@ -246,6 +265,7 @@
         private System.Windows.Forms.Button updatedFolderNumberButton;
         private System.Windows.Forms.Label DescriptionLabel2;
         private System.Windows.Forms.TableLayoutPanel searchResultTableLayoutPanel;
+        private System.Windows.Forms.Label descriptionLabel3;
     }
 }
 

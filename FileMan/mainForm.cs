@@ -26,6 +26,8 @@ namespace FileMan
         public mainForm()
         {
             InitializeComponent();
+            //only show the mainForm search part.
+            this.Size = new Size(392, 562);
             ScrollBar vScrollBar1 = new VScrollBar();
             vScrollBar1.Dock = DockStyle.Right;
             vScrollBar1.Scroll += (sender, e) => { flowLayoutPanel.VerticalScroll.Value = vScrollBar1.Value; };
@@ -100,9 +102,18 @@ namespace FileMan
             };
             SetSearchCondtionRichTextBoxFormat(searchCueTextBoxRichTextBox);
 
+            //show the mainForm search part and result part.
+            this.Size = new Size(1220, 562);
+
             //to clear search result tablelayoutPanel
             searchResultTableLayoutPanel.Controls.Clear();
             searchResultTableLayoutPanel.RowStyles.Clear();
+
+            //to set the autoscroll for tablelayoutPanel, need to set autoscroll as false firstly, otherwise table cannot shrink
+            searchResultTableLayoutPanel.AutoScroll = false;
+            searchResultTableLayoutPanel.Size = new Size(723, 317);
+            searchResultTableLayoutPanel.MaximumSize = new Size(723, 317);
+            searchResultTableLayoutPanel.AutoScroll = true;
 
             //check the search key word
             if (searchCueTextBox.Text != "")
@@ -134,6 +145,29 @@ namespace FileMan
 
             //query the xml input file based on the search conditions
             List<DOTFile> dOTQueriedFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", searchCueTextBox.Text, fromDateTime, toDateTime);
+
+            //fill out the button of how many files updated for the search conditions
+            updatedFilesNumberButton.Text = dOTQueriedFiles.Count.ToString();
+
+            //change the size of the button of how many files according to the count
+            updatedFilesNumberButton.Width = updatedFilesNumberButton.Text.Length;
+
+            //fill out the button of how many folders updated for the search conditions
+            var distinctFolderCount = dOTQueriedFiles.Select(x => x.ParentFolder).Distinct().Count();
+            updatedFolderNumberButton.Text = distinctFolderCount.ToString();
+
+            //change the size of the button of how many folders according to the count
+            updatedFolderNumberButton.Width = updatedFolderNumberButton.Text.Length;
+
+            //set up the following content positions
+            DescriptionLabel2.Location = new Point(updatedFilesNumberButton.Location.X + updatedFilesNumberButton.Width,
+                                                   DescriptionLabel2.Location.Y);
+            updatedFolderNumberButton.Location = new Point(DescriptionLabel2.Location.X + DescriptionLabel2.Width,
+                                                           updatedFolderNumberButton.Location.Y);
+            descriptionLabel3.Location = new Point(updatedFolderNumberButton.Location.X + updatedFolderNumberButton.Width,
+                                                   descriptionLabel3.Location.Y);
+
+
 
             //fill out the query results table
             fillTableLayoutPanel(dOTQueriedFiles);
@@ -191,14 +225,16 @@ namespace FileMan
             searchResultTableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40F));
             searchResultTableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30F));
             searchResultTableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 50F));
-            searchResultTableLayoutPanel.Controls.Add(new Label() { Text = "Modified File's Name" }, 0, 0);
-            searchResultTableLayoutPanel.Controls.Add(new Label() { Text = "The Located Folder" }, 1, 0);
+            searchResultTableLayoutPanel.Controls.Add(new Label() { Text = "Modified File's Name", AutoSize = true }, 0, 0);
+            searchResultTableLayoutPanel.Controls.Add(new Label() { Text = "The Located Folder", AutoSize = true }, 1, 0);
             foreach (var dOTQueriedFile in dOTQueriedFiles)
             {
                 searchResultTableLayoutPanel.RowCount = searchResultTableLayoutPanel.RowCount + 1;
                 searchResultTableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 50F));
-                searchResultTableLayoutPanel.Controls.Add(new Label() { Text = dOTQueriedFile.Name }, 0, searchResultTableLayoutPanel.RowCount - 1);
-                searchResultTableLayoutPanel.Controls.Add(new Label() { Text = dOTQueriedFile.ParentFolder }, 1, searchResultTableLayoutPanel.RowCount - 1);
+                //MessageBox.Show(dOTQueriedFile.Name);
+                //AutoSize property has to be true, otherwise the content got cut as unexpected.
+                searchResultTableLayoutPanel.Controls.Add(new Label() { Text = dOTQueriedFile.Name, AutoSize = true }, 0, searchResultTableLayoutPanel.RowCount - 1);
+                searchResultTableLayoutPanel.Controls.Add(new Label() { Text = dOTQueriedFile.ParentFolder, AutoSize = true }, 1, searchResultTableLayoutPanel.RowCount - 1);
             }
         }
 
@@ -233,6 +269,47 @@ namespace FileMan
         private void mainForm_Load(object sender, EventArgs e)
         {
 
+        }
+
+        private void DescriptionLabel2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void mainForm_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void searchResultGroupBox_Paint(object sender, PaintEventArgs e)
+        {
+            Pen pen = new Pen(Color.FromArgb(255, 0, 0, 0));
+            e.Graphics.DrawLine(pen, 17, 60, 718, 60);
+        }
+
+        private void searchResultTableLayoutPanel_MouseClick(object sender, MouseEventArgs e)
+        {
+            //the code is not working when having scrolls
+            //int row = 0;
+            //int verticalOffset = 0;
+            //foreach (int h in searchResultTableLayoutPanel.GetRowHeights())
+            //{
+            //    int column = 0;
+            //    int horizontalOffset = 0;
+            //    foreach (int w in searchResultTableLayoutPanel.GetColumnWidths())
+            //    {
+            //        Rectangle rectangle = new Rectangle(horizontalOffset, verticalOffset, w, h);
+            //        if (rectangle.Contains(e.Location))
+            //        {
+            //            MessageBox.Show(String.Format("row {0}, column {1} was clicked", row, column));
+            //            return;
+            //        }
+            //        horizontalOffset += w;
+            //        column++;
+            //    }
+            //    verticalOffset += h;
+            //    row++;
+            //}
         }
     }
 }
