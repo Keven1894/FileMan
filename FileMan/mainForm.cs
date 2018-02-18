@@ -88,11 +88,32 @@ namespace FileMan
         private void showDynamicInfo()
         {
             //query the xml input file based on the search conditions
-            List<DOTFile> dOTQueriedFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", "", DateTime.Now, DateTime.Now);
+            List<DOTFile> dOTQueriedFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", "", DateTime.Now.AddDays(1), DateTime.Now);
             var distinctFolderCount = dOTQueriedFiles.Select(x => x.ParentFolder).Distinct().Count();
             String totalFileAndFolderInfo = "There are " + dOTQueriedFiles.Count.ToString() + " files and " + distinctFolderCount.ToString() + " folders into File Management System.";
             Label totalFileAndFolderInfoLabel = (Label)Controls["panelSearchPage"].Controls["totalFileAndFolderInfoLabel"];
             totalFileAndFolderInfoLabel.Text = totalFileAndFolderInfo;
+
+            //[PL0218]Filter based on file types
+            List<DOTFile> dOTPDFFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", ".pdf", DateTime.Now.AddDays(1), DateTime.Now);
+            LinkLabel linkLabelFileType1 = (LinkLabel)Controls["panelSearchPage"].Controls["linkLabelFileType1"];
+            linkLabelFileType1.Text = dOTPDFFiles.Count.ToString() + " PDF Files";
+            linkLabelFileType1.LinkArea = new System.Windows.Forms.LinkArea(0, dOTPDFFiles.Count.ToString().Length);
+ 
+            List<DOTFile> dOTTIFFFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", ".tiff", DateTime.Now.AddDays(1), DateTime.Now);
+            LinkLabel linkLabelFileType2 = (LinkLabel)Controls["panelSearchPage"].Controls["linkLabelFileType2"];
+            linkLabelFileType2.Text = dOTTIFFFiles.Count.ToString() + " TIFF Files";
+            linkLabelFileType2.LinkArea = new System.Windows.Forms.LinkArea(0, dOTTIFFFiles.Count.ToString().Length);
+
+            List<DOTFile> dOTJPGFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", ".jpg", DateTime.Now.AddDays(1), DateTime.Now);
+            LinkLabel linkLabelFileType3 = (LinkLabel)Controls["panelSearchPage"].Controls["linkLabelFileType3"];
+            linkLabelFileType3.Text = dOTJPGFiles.Count.ToString() + " JPG Files";
+            linkLabelFileType3.LinkArea = new System.Windows.Forms.LinkArea(0, dOTJPGFiles.Count.ToString().Length);
+
+            LinkLabel linkLabelFileType4 = (LinkLabel)Controls["panelSearchPage"].Controls["linkLabelFileType4"];
+            int otherFileTypeCount = dOTQueriedFiles.Count - dOTPDFFiles.Count - dOTTIFFFiles.Count - dOTJPGFiles.Count;
+            linkLabelFileType4.Text = otherFileTypeCount.ToString() + " Other Files";
+            linkLabelFileType4.LinkArea = new System.Windows.Forms.LinkArea(0, otherFileTypeCount.ToString().Length);
 
         }
 
@@ -251,18 +272,46 @@ namespace FileMan
             };
             panelSearchPage.Controls.Add(useAsHorizontalLine);
 
+            //[PL0218]Add file types label
+            LinkLabel linkLabelFileType1 = new LinkLabel()
+            {
+                Name = "linkLabelFileType1",
+                AutoSize = true,
+                Location = new Point(13, 657),
+                Font = new Font("Segoe UI", 12),
+                Text = ""
+            };
+            panelSearchPage.Controls.Add(linkLabelFileType1);
 
+            LinkLabel linkLabelFileType2 = new LinkLabel()
+            {
+                Name = "linkLabelFileType2",
+                AutoSize = true,
+                Location = new Point(150, 657),
+                Font = new Font("Segoe UI", 12),
+                Text = ""
+            };
+            panelSearchPage.Controls.Add(linkLabelFileType2);
 
+            LinkLabel linkLabelFileType3 = new LinkLabel()
+            {
+                Name = "linkLabelFileType3",
+                AutoSize = true,
+                Location = new Point(300, 657),
+                Font = new Font("Segoe UI", 12),
+                Text = ""
+            };
+            panelSearchPage.Controls.Add(linkLabelFileType3);
 
-
-
-
-
-
-
-
-
-
+            LinkLabel linkLabelFileType4 = new LinkLabel()
+            {
+                Name = "linkLabelFileType4",
+                AutoSize = true,
+                Location = new Point(450, 657),
+                Font = new Font("Segoe UI", 12),
+                Text = ""
+            };
+            panelSearchPage.Controls.Add(linkLabelFileType4);
 
 
             //[PL0217]Add panel for advanced search
