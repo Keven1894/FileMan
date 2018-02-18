@@ -28,6 +28,7 @@ namespace FileMan
         {
             InitializeComponent();
             initComponentsSetup();
+            showDynamicInfo();
             //only show the mainForm search part.
             this.Size = new Size(816, 854);
             ScrollBar vScrollBar1 = new VScrollBar();
@@ -82,6 +83,17 @@ namespace FileMan
                 Font = new Font("Segoe UI", 10)
             };
             this.Controls.Add(labelFooter);
+        }
+
+        private void showDynamicInfo()
+        {
+            //query the xml input file based on the search conditions
+            List<DOTFile> dOTQueriedFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", "", DateTime.Now, DateTime.Now);
+            var distinctFolderCount = dOTQueriedFiles.Select(x => x.ParentFolder).Distinct().Count();
+            String totalFileAndFolderInfo = "There are " + dOTQueriedFiles.Count.ToString() + " files and " + distinctFolderCount.ToString() + " folders into File Management System.";
+            Label totalFileAndFolderInfoLabel = (Label)Controls["panelSearchPage"].Controls["totalFileAndFolderInfoLabel"];
+            totalFileAndFolderInfoLabel.Text = totalFileAndFolderInfo;
+
         }
 
         private Panel createPagePanel(String panelName)
@@ -219,6 +231,40 @@ namespace FileMan
             };
             panelSearchPage.Controls.Add(recentFilesLabel);
 
+            Label totalFileAndFolderInfoLabel = new Label()
+            {
+                Name = "totalFileAndFolderInfoLabel",
+                Location = new Point(10, 616),
+                Font = new Font("Segoe UI Semibold", 15, FontStyle.Bold),
+                AutoSize = true,
+                Text = "There are"
+            };
+            panelSearchPage.Controls.Add(totalFileAndFolderInfoLabel);
+
+            //[PL0218]Add horizontal line
+            Panel useAsHorizontalLine = new Panel()
+            {
+                Location = new Point(13, 645),
+                Size = new Size(735, 1),
+                BorderStyle = BorderStyle.FixedSingle,
+                Name = "useAsHorizontalLine"
+            };
+            panelSearchPage.Controls.Add(useAsHorizontalLine);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             //[PL0217]Add panel for advanced search
             Panel panelAdvancedSearch = new Panel()
             {
@@ -323,10 +369,8 @@ namespace FileMan
                 //fill out the query results table
                 fillDataGridView(dOTQueriedFiles);
 
-                //[PL0217]Fill the recent search label.
-                
+                //[PL0217]Fill the recent search label.                
                 Label recentSearchLabel = (Label)Controls["panelSearchPage"].Controls["recentSearchLabel"];
-
                 switch (numberOfSearchTerm % 3)
                 {
                     case 0:
@@ -354,18 +398,8 @@ namespace FileMan
                 else if (keywordFirst != "") {
                     recentSearchLabel.Text = "Recent search term: ";
                     recentSearchLabel.Text = recentSearchLabel.Text + "\"" + keywordFirst + "\".";
-                }
-                
+                }                
                 numberOfSearchTerm++;
-
-                //ArrayList keywordArray = new ArrayList();
-                //keywordArray.Add(searchCueTextBox.Text);
-
-                //foreach (String singleKeyword in keywordArray)
-                //{
-                //    recentSearchLabel.Text += singleKeyword;
-                //}
-
             }
             else
             {
