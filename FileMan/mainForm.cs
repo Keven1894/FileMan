@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.IO;
 using System.Xml.Linq;
 using System.Drawing.Drawing2D;
+using System.Collections;
 
 namespace FileMan
 {
@@ -200,7 +201,7 @@ namespace FileMan
 
             Label recentSearchLabel = new Label()
             {
-                Name = "descriptionLabel3",
+                Name = "recentSearchLabel",
                 Location = new Point(100, 190),
                 Font = new Font("Segoe UI Semibold", 15, FontStyle.Bold),
                 AutoSize = true,
@@ -210,7 +211,7 @@ namespace FileMan
 
             Label recentFilesLabel = new Label()
             {
-                Name = "descriptionLabel3",
+                Name = "recentFilesLabel",
                 Location = new Point(100, 230),
                 Font = new Font("Segoe UI Semibold", 15, FontStyle.Bold),
                 AutoSize = true,
@@ -292,6 +293,10 @@ namespace FileMan
             }
         }
 
+        int numberOfSearchTerm = 0;
+        String keywordFirst = "";
+        String keywordSecond = "";
+        String keywordThird = "";
         private void Searchbutton_Click(object sender, EventArgs e)
         {
             //[PL0217]Refer to the dynamic created component
@@ -317,6 +322,50 @@ namespace FileMan
 
                 //fill out the query results table
                 fillDataGridView(dOTQueriedFiles);
+
+                //[PL0217]Fill the recent search label.
+                
+                Label recentSearchLabel = (Label)Controls["panelSearchPage"].Controls["recentSearchLabel"];
+
+                switch (numberOfSearchTerm % 3)
+                {
+                    case 0:
+                        keywordFirst = searchCueTextBox.Text;
+                        break;
+                    case 1:
+                        keywordSecond = searchCueTextBox.Text;
+                        break;
+                    case 2:
+                        keywordThird = searchCueTextBox.Text;
+                        break;
+                    default:
+                        break;
+                };
+                if (keywordFirst != "" && keywordSecond != "" && keywordThird != "")
+                {
+                    recentSearchLabel.Text = "Recent search term: ";
+                    recentSearchLabel.Text = recentSearchLabel.Text + "\"" + keywordFirst + "\", \"" + keywordSecond + "\", \"" + keywordThird + "\".";
+                }
+                else if (keywordFirst != "" && keywordSecond != "")
+                {
+                    recentSearchLabel.Text = "Recent search term: ";
+                    recentSearchLabel.Text = recentSearchLabel.Text + "\"" + keywordFirst + "\", \"" + keywordSecond + "\".";
+                }
+                else if (keywordFirst != "") {
+                    recentSearchLabel.Text = "Recent search term: ";
+                    recentSearchLabel.Text = recentSearchLabel.Text + "\"" + keywordFirst + "\".";
+                }
+                
+                numberOfSearchTerm++;
+
+                //ArrayList keywordArray = new ArrayList();
+                //keywordArray.Add(searchCueTextBox.Text);
+
+                //foreach (String singleKeyword in keywordArray)
+                //{
+                //    recentSearchLabel.Text += singleKeyword;
+                //}
+
             }
             else
             {
@@ -324,7 +373,7 @@ namespace FileMan
                 warningLabel.Visible = true;
                 warningLabel.ForeColor = Color.Red;
             }
- 
+            searchCueTextBox.Text = "";
         }
 
         private List<DOTFile> queryInfoFromXMLInputFile(String XMLInputFileName, String fileNameKeyWord, DateTime fromDateTime, DateTime toDateTime)
