@@ -15,29 +15,234 @@ namespace FileMan
 {
     public partial class mainForm : Form
     {
-        FlowLayoutPanel flowLayoutPanel = new FlowLayoutPanel
-        {
-            Location = new Point(23, 230),
-            Size = new Size(330, 280),
-            BorderStyle = BorderStyle.FixedSingle,
-            Name = "FlowLayoutPanel",
-            TabIndex = 0
-        };
+        //FlowLayoutPanel flowLayoutPanel = new FlowLayoutPanel
+        //{
+        //    Location = new Point(23, 230),
+        //    Size = new Size(300, 300),
+        //    BorderStyle = BorderStyle.FixedSingle,
+        //    Name = "FlowLayoutPanel",
+        //    TabIndex = 0
+        //};
         public mainForm()
         {
             InitializeComponent();
+            initComponentsSetup();
             //only show the mainForm search part.
-            this.Size = new Size(392, 562);
+            this.Size = new Size(816, 854);
             ScrollBar vScrollBar1 = new VScrollBar();
             vScrollBar1.Dock = DockStyle.Right;
-            vScrollBar1.Scroll += (sender, e) => { flowLayoutPanel.VerticalScroll.Value = vScrollBar1.Value; };
-            flowLayoutPanel.Controls.Add(vScrollBar1);
-            this.Controls.Add(flowLayoutPanel);
+            //vScrollBar1.Scroll += (sender, e) => { flowLayoutPanel.VerticalScroll.Value = vScrollBar1.Value; };
+            //flowLayoutPanel.Controls.Add(vScrollBar1);
+            //this.Controls.Add(flowLayoutPanel);
             //obtain the input file and check if it is the latest one
             Boolean inputFileStatus = CheckTheInputFileStatus();
+        }
 
-            setButtonOutlookAsLabel(updatedFilesNumberButton);
-            setButtonOutlookAsLabel(updatedFolderNumberButton);
+        private void initComponentsSetup()
+        {
+            //[PL0217]Add panel for menu
+            Panel panelMenu = new Panel()
+            {
+                Location = new Point(23, 15),
+                Size = new Size(140, 90),
+                BorderStyle = BorderStyle.None,
+                Name = "FlowLayoutPanel",
+                TabIndex = 0
+            };
+            //[PL0217]Radio buttons for menu
+            RadioButton radioButtonSearch = new RadioButton()
+            {
+                Text = "Search",
+                Location = new Point(5, 0),
+                Font = new Font("Segoe UI Semilight", 24),
+                AutoSize = true
+            };
+            RadioButton radioButtonAddFile = new RadioButton()
+            {
+                Text = "Add File",
+                Location = new Point(5, 45),
+                Font = new Font("Segoe UI Semilight", 24),
+                AutoSize = true
+            };
+            panelMenu.Controls.Add(radioButtonSearch);
+            panelMenu.Controls.Add(radioButtonAddFile);
+            panelMenu.Visible = true;
+            this.Controls.Add(panelMenu);
+
+            initSearchPageComponentsSetup();
+            initAddFilePageComponentsSetup();
+
+            //[PL0217]Setup footer
+            Label labelFooter = new Label()
+            {
+                Text = "About the File Management System | Copyright 2017 \u00A9 FDOT Traffic Operations, District Six",
+                Location = new Point(23, 790),
+                AutoSize = true,
+                Font = new Font("Segoe UI", 10)
+            };
+            this.Controls.Add(labelFooter);
+        }
+
+        private Panel createPagePanel(String panelName)
+        {
+            Panel panel = new Panel()
+            {
+                Name = panelName,
+                Location = new Point(23, 80),
+                Size = new Size(760, 700),
+                BorderStyle = BorderStyle.FixedSingle,
+                TabIndex = 0
+            };
+
+            return panel;
+        }
+
+        private void initSearchPageComponentsSetup()
+        {
+            //[PL0217]Create a big panel for all "Search page" components.
+            Panel panelSearchPage = createPagePanel("panelSearchPage");
+
+            //[PL0217]Add button for advanced search.
+            Button buttonAdvanced = new Button()
+            {
+                Text = "Advanced",
+                Font = new Font("Segoe UI", 12),
+                Location = new Point(100, 25),
+                Size = new Size(93, 40),
+                AutoSize = true
+            };
+            panelSearchPage.Controls.Add(buttonAdvanced);
+
+            //[PL0217]Add cueText search.
+            CueTextBox searchCueTextBox = new CueTextBox()
+            {
+                Name = "searchCueTextBox",
+                Cue = "Search",
+                Font = new Font("Segoe UI", 15),
+                Location = new Point(207, 28),
+                Size = new Size(435, 30)
+            };
+            panelSearchPage.Controls.Add(searchCueTextBox);
+
+            //[PL0217]Add warning label to avoid empty search, that will return all files, performance low.
+            Label warningLabel = new Label()
+            {
+                Name = "warningLabel",
+                Font = new Font("Segoe UI", 12),
+                Location = new Point(205, 60),
+                AutoSize = true
+            };
+            warningLabel.Visible = false;
+            panelSearchPage.Controls.Add(warningLabel);
+
+            //[PL0217]Add zoom search button.
+            Button Searchbutton = new Button()
+            {
+                Name = "Searchbutton",
+                BackgroundImage = Image.FromFile(@".\assets\img\zoom.png"),
+                BackgroundImageLayout = ImageLayout.Stretch,
+                Location = new Point(610, 30),
+                Size = new Size(28, 30)
+            };
+            Searchbutton.Click += new EventHandler(Searchbutton_Click);            
+            panelSearchPage.Controls.Add(Searchbutton);
+            Searchbutton.BringToFront();
+
+            //[PL0217]Add lable for past time condition.
+            Label labelChangesInPast = new Label()
+            {
+                Text = "Changes in the past:",
+                Font = new Font("Segoe UI Semibold", 15, FontStyle.Bold),
+                Location = new Point(100, 85),
+                AutoSize = true
+
+            };
+            panelSearchPage.Controls.Add(labelChangesInPast);
+
+            //[PL0217]Add comboBox for past time condition
+            ComboBox comboBoxChangesInPast = new ComboBox()
+            {                
+                Location = new Point(325, 85),
+                Font = new Font("Segoe UI", 15)
+            };
+            comboBoxChangesInPast.Items.Add("24 Hours");
+            comboBoxChangesInPast.Items.Add("2 Days");
+            comboBoxChangesInPast.Items.Add("3 Days");
+            comboBoxChangesInPast.SelectedIndex = 0;
+            panelSearchPage.Controls.Add(comboBoxChangesInPast);
+
+            //[PL0217]Add text info for number of files and folders changed.
+            //Button updatedFilesNumberButton = new Button()
+            //{
+            //    Name = "updatedFilesNumberButton",
+            //    Location = new Point(100, 150),
+            //    Font = new Font("Segoe UI Semibold", 15, FontStyle.Bold)
+            //};
+            //setButtonOutlookAsLabel(updatedFilesNumberButton);
+            //panelSearchPage.Controls.Add(updatedFilesNumberButton);
+            Label recentChangeStatisticLabel = new Label()
+            {
+                Name = "recentChangeStatisticLabel",
+                Location = new Point(100, 150),
+                Font = new Font("Segoe UI Semibold", 15, FontStyle.Bold),
+                AutoSize = true,
+                Text = " "
+            };
+            panelSearchPage.Controls.Add(recentChangeStatisticLabel);
+            //Button updatedFolderNumberButton = new Button()
+            //{
+            //    Name = "updatedFolderNumberButton",
+            //    Location = new Point(206, 150),
+            //    Font = new Font("Segoe UI Semibold", 15, FontStyle.Bold)
+            //};
+            //setButtonOutlookAsLabel(updatedFolderNumberButton);
+            //panelSearchPage.Controls.Add(updatedFolderNumberButton);
+
+            Label recentSearchLabel = new Label()
+            {
+                Name = "descriptionLabel3",
+                Location = new Point(100, 190),
+                Font = new Font("Segoe UI Semibold", 15, FontStyle.Bold),
+                AutoSize = true,
+                Text = "Recent search term: "
+            };
+            panelSearchPage.Controls.Add(recentSearchLabel);
+
+            Label recentFilesLabel = new Label()
+            {
+                Name = "descriptionLabel3",
+                Location = new Point(100, 230),
+                Font = new Font("Segoe UI Semibold", 15, FontStyle.Bold),
+                AutoSize = true,
+                Text = "Recent Files..."
+            };
+            panelSearchPage.Controls.Add(recentFilesLabel);
+
+            //[PL0217]Add panel for advanced search
+            Panel panelAdvancedSearch = new Panel()
+            {
+                Location = new Point(23, 230),
+                Size = new Size(300, 300),
+                BorderStyle = BorderStyle.FixedSingle,
+                Name = "panelAdvancedSearch",
+                TabIndex = 0
+            };
+            panelAdvancedSearch.Visible = false;
+            panelSearchPage.Controls.Add(panelAdvancedSearch);
+            this.Controls.Add(panelSearchPage);
+
+
+
+
+
+        }
+
+        private void initAddFilePageComponentsSetup()
+        {
+            //[PL0217]Create a big panel for all "Add File" components.
+            Panel panelSearchPage = createPagePanel("panelSearchPage");
+
+
         }
 
         private void setButtonOutlookAsLabel(Button button)
@@ -45,12 +250,13 @@ namespace FileMan
             button.TabStop = false;
             button.FlatAppearance.BorderSize = 0;
             button.AutoSize = true;
+            button.BackColor = Color.Transparent;
         }
 
         private Boolean CheckTheInputFileStatus()
         {
             string csv = File.ReadAllText("./inputFile/FileInfoSummary.csv");
-            XDocument doc = ConverstorCsvToXml.ConvertCsvToXML(csv, new[] { "|" });
+            XDocument doc = ConverstorCsvToXml.ConvertCsvToXML(csv, new[] { "\",\"" });
             doc.Save("./inputFile/outputxml.xml");
 
 
@@ -88,79 +294,37 @@ namespace FileMan
 
         private void Searchbutton_Click(object sender, EventArgs e)
         {
-            //to remove all RichTextBoxs
-            List<Control> listControls = flowLayoutPanel.Controls.Cast<Control>().ToList();
-
-            foreach (Control control in listControls)
-            {
-                flowLayoutPanel.Controls.Remove(control);
-                control.Dispose();
-            }
-            RichTextBox searchCueTextBoxRichTextBox = new RichTextBox
-            {
-                Text = "File name contains key word:" + searchCueTextBox.Text + "         X"
-            };
-            SetSearchCondtionRichTextBoxFormat(searchCueTextBoxRichTextBox);
-
-            //show the mainForm search part and result part.
-            this.Size = new Size(1220, 562);
-
+            //[PL0217]Refer to the dynamic created component
+            CueTextBox searchCueTextBox = (CueTextBox)Controls["panelSearchPage"].Controls["searchCueTextBox"];
+            Label warningLabel = (Label)Controls["panelSearchPage"].Controls["warningLabel"];
+            warningLabel.Visible = false;
             //check the search key word
             if (searchCueTextBox.Text != "")
             {
                 warningLabel.Text = "";
-                flowLayoutPanel.Controls.Add(searchCueTextBoxRichTextBox);
+                //get from datetime
+                DateTime fromDateTime = GetDateTimeConsolidation(fromDatePortionDateTimePicker, fromTimePortionDateTimePicker);
+                
+                //get to datetime
+                DateTime toDateTime = GetDateTimeConsolidation(toDatePorttionDateTimePicker, toTimePortionDateTimePicker);
+
+                //query the xml input file based on the search conditions
+                List<DOTFile> dOTQueriedFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", searchCueTextBox.Text, fromDateTime, toDateTime);
+                var distinctFolderCount = dOTQueriedFiles.Select(x => x.ParentFolder).Distinct().Count();
+                String recentChangeStatistic = dOTQueriedFiles.Count.ToString() + " Files, " + distinctFolderCount.ToString() + " Folders changed.";
+                Label recentChangeStatisticLabel = (Label)Controls["panelSearchPage"].Controls["recentChangeStatisticLabel"];
+                recentChangeStatisticLabel.Text = recentChangeStatistic;
+
+                //fill out the query results table
+                fillDataGridView(dOTQueriedFiles);
             }
             else
             {
-                warningLabel.Text = "File name filter condition is empty.";
+                warningLabel.Text = "Please specify the keyword to search.";
+                warningLabel.Visible = true;
                 warningLabel.ForeColor = Color.Red;
             }
-            //get from datetime
-            DateTime fromDateTime = GetDateTimeConsolidation(fromDatePortionDateTimePicker, fromTimePortionDateTimePicker);
-            RichTextBox searchFromDateTime = new RichTextBox
-            {
-                Text = "File modified from:" + fromDateTime.ToString() + "         X"
-            };
-            SetSearchCondtionRichTextBoxFormat(searchFromDateTime);
-            flowLayoutPanel.Controls.Add(searchFromDateTime);
-            //get to datetime
-            DateTime toDateTime = GetDateTimeConsolidation(toDatePorttionDateTimePicker, toTimePortionDateTimePicker);
-            RichTextBox searchToDateTime = new RichTextBox
-            {
-                Text = "File modified to:" + toDateTime.ToString() + "         X"
-            };
-            SetSearchCondtionRichTextBoxFormat(searchToDateTime);
-            flowLayoutPanel.Controls.Add(searchToDateTime);
-
-            //query the xml input file based on the search conditions
-            List<DOTFile> dOTQueriedFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", searchCueTextBox.Text, fromDateTime, toDateTime);
-
-            //fill out the button of how many files updated for the search conditions
-            updatedFilesNumberButton.Text = dOTQueriedFiles.Count.ToString();
-
-            //change the size of the button of how many files according to the count
-            updatedFilesNumberButton.Width = updatedFilesNumberButton.Text.Length;
-
-            //fill out the button of how many folders updated for the search conditions
-            var distinctFolderCount = dOTQueriedFiles.Select(x => x.ParentFolder).Distinct().Count();
-            updatedFolderNumberButton.Text = distinctFolderCount.ToString();
-
-            //change the size of the button of how many folders according to the count
-            updatedFolderNumberButton.Width = updatedFolderNumberButton.Text.Length;
-
-            //set up the following content positions
-            DescriptionLabel2.Location = new Point(updatedFilesNumberButton.Location.X + updatedFilesNumberButton.Width,
-                                                   DescriptionLabel2.Location.Y);
-            updatedFolderNumberButton.Location = new Point(DescriptionLabel2.Location.X + DescriptionLabel2.Width,
-                                                           updatedFolderNumberButton.Location.Y);
-            descriptionLabel3.Location = new Point(updatedFolderNumberButton.Location.X + updatedFolderNumberButton.Width,
-                                                   descriptionLabel3.Location.Y);
-
-
-
-            //fill out the query results table
-            fillDataGridView(dOTQueriedFiles);
+ 
         }
 
         private List<DOTFile> queryInfoFromXMLInputFile(String XMLInputFileName, String fileNameKeyWord, DateTime fromDateTime, DateTime toDateTime)
@@ -202,7 +366,7 @@ namespace FileMan
                                        where c.Attribute("name").Value == fileAttribute
                                        select c.Attribute("value").Value;
             foreach (var theFileAttributeContent in fileAttributeContent)
-            { 
+            {
                 return theFileAttributeContent.ToString();
             }
             return "";
@@ -220,29 +384,29 @@ namespace FileMan
         //below function is used to change the tableLayoutPanel border color.
         private void searchResultTableLayoutPanel_CellPaint(object sender, TableLayoutCellPaintEventArgs e)
         {
-        //    Graphics g = e.Graphics;
-        //    Rectangle r = e.CellBounds;
+            //    Graphics g = e.Graphics;
+            //    Rectangle r = e.CellBounds;
 
-        //    using (Pen pen = new Pen(Color.CornflowerBlue, 0 /*1px width despite of page scale, dpi, page units*/ ))
-        //    {
-        //        pen.Alignment = System.Drawing.Drawing2D.PenAlignment.Center;
-        //        // define border style
-        //        pen.DashStyle = System.Drawing.Drawing2D.DashStyle.Solid;
+            //    using (Pen pen = new Pen(Color.CornflowerBlue, 0 /*1px width despite of page scale, dpi, page units*/ ))
+            //    {
+            //        pen.Alignment = System.Drawing.Drawing2D.PenAlignment.Center;
+            //        // define border style
+            //        pen.DashStyle = System.Drawing.Drawing2D.DashStyle.Solid;
 
-        //        // decrease border rectangle height/width by pen's width for last row/column cell
-        //        if (e.Row == (searchResultTableLayoutPanel.RowCount - 1))
-        //        {
-        //            r.Height -= 1;
-        //        }
+            //        // decrease border rectangle height/width by pen's width for last row/column cell
+            //        if (e.Row == (searchResultTableLayoutPanel.RowCount - 1))
+            //        {
+            //            r.Height -= 1;
+            //        }
 
-        //        if (e.Column == (searchResultTableLayoutPanel.ColumnCount - 1))
-        //        {
-        //            r.Width -= 1;
-        //        }
+            //        if (e.Column == (searchResultTableLayoutPanel.ColumnCount - 1))
+            //        {
+            //            r.Width -= 1;
+            //        }
 
-        //        // use graphics mehtods to draw cell's border
-        //        e.Graphics.DrawRectangle(pen, r);
-        //    }
+            //        // use graphics mehtods to draw cell's border
+            //        e.Graphics.DrawRectangle(pen, r);
+            //    }
         }
 
         private void mainForm_Load(object sender, EventArgs e)
@@ -289,6 +453,21 @@ namespace FileMan
             //    verticalOffset += h;
             //    row++;
             //}
+        }
+
+        private void searchResultGroupBox_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void descriptionLabel3_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
