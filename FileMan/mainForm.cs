@@ -146,31 +146,6 @@ namespace FileMan
             linkLabelFileType4.LinkArea = new System.Windows.Forms.LinkArea(0, otherFileTypeCount.ToString().Length);
         }
 
-
-        //Sample code for click link area:
-        //private void linkLabel1_LinkClicked(object sender, System.Windows.Forms.LinkLabelLinkClickedEventArgs e)
-        //{
-        //    // Determine which link was clicked within the LinkLabel.
-        //    this.linkLabel1.Links[linkLabel1.Links.IndexOf(e.Link)].Visited = true;
-
-        //    // Display the appropriate link based on the value of the 
-        //    // LinkData property of the Link object.
-        //    string target = e.Link.LinkData as string;
-
-        //    // If the value looks like a URL, navigate to it.
-        //    // Otherwise, display it in a message box.
-        //    if (null != target && target.StartsWith("www"))
-        //    {
-        //        System.Diagnostics.Process.Start(target);
-        //    }
-        //    else
-        //    {
-        //        MessageBox.Show("Item clicked: " + target);
-        //    }
-        //}
-
-
-
         private Panel createPagePanel(String panelName)
         {
             Panel panel = new Panel()
@@ -396,7 +371,15 @@ namespace FileMan
         private void LinkLabelFileType4_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             //[PL0218]"Other" file type link is clicked
-
+            FileQueryConditions fileQueryConditions = new FileQueryConditions()
+            {
+                FileNameNotContain = new String[] { ".jpg", ".tiff", ".pdf" },
+                DateCreatedTimeFrom = DateTime.Now.AddDays(1),
+                DateCreatedTimeTo = DateTime.Now
+            };
+            List<DOTFile> dOTOtherFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", fileQueryConditions);
+            //fill out the query results table
+            fillDataGridView(dOTOtherFiles);
         }
 
         private void LinkLabelFileType3_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -611,12 +594,25 @@ namespace FileMan
                 var selectedForTextFilterAndCreatedFromAndToTime = from cli in selectedForTextFilterAndCreatedFromTime.Elements("var")
                                                                    where (string)cli.Attribute("name").Value == "DateCreated" && DateTime.Parse(cli.Attribute("value").Value).CompareTo(toDateTime) <= 0
                                                                    select cli.Parent;
-                //var selected = from cli in root.Elements("row").Elements("var")
-                //               where (string)cli.Attribute("name").Value == "Name" && cli.Attribute("value").Value.Contains(fileNameKeyWord) == true
-                //               where (string)cli.Attribute("name").Value == "DateCreated" && DateTime.Parse(cli.Attribute("value").Value).CompareTo(fromDateTime) >= 0
-                //               where (string)cli.Attribute("name").Value == "DateCreated" && DateTime.Parse(cli.Attribute("value").Value).CompareTo(toDateTime) <= 0
-                //               select cli.Parent;
                 foreach (var d in selectedForTextFilterAndCreatedFromAndToTime)
+                {
+                    DOTFile dOTFile = queryInfoForOneFile(d);
+                    dOTFiles.Add(dOTFile);
+                }
+                return dOTFiles;
+            }
+            else if (fileQueryConditions.FileNameNotContain != null)
+            {
+                var fullList = from cli in root.Elements("row").Elements("var")
+                               select cli.Parent;
+                //[PL0218]this is not a good way, need to dynamic generate the filter conditon, instead of hardcode.
+                var selected = from cli in root.Elements("row").Elements("var")
+                               where (string)cli.Attribute("name").Value == "Name" && 
+                               (cli.Attribute("value").Value.Contains(fileQueryConditions.FileNameNotContain[0]) == true ||
+                               cli.Attribute("value").Value.Contains(fileQueryConditions.FileNameNotContain[1]) == true ||
+                               cli.Attribute("value").Value.Contains(fileQueryConditions.FileNameNotContain[2]) == true)
+                               select cli.Parent;
+                foreach (var d in fullList.Except(selected))
                 {
                     DOTFile dOTFile = queryInfoForOneFile(d);
                     dOTFiles.Add(dOTFile);
