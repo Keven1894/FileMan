@@ -53,6 +53,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="DOTFile.cs" />
+    <Compile Include="FileQueryConditions.cs" />
     <Compile Include="mainForm.cs">
       <SubType>Form</SubType>
     </Compile>

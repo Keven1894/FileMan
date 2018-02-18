@@ -85,27 +85,57 @@ namespace FileMan
             this.Controls.Add(labelFooter);
         }
 
+        private void showPastDaysChanges(DateTime fromDateTime)
+        {
+            //[PL0218]Show recent "fromDateTime" to "now" changes
+            FileQueryConditions fileQueryConditions = new FileQueryConditions()
+            {
+                FileName = "",
+                DateCreatedTimeFrom = fromDateTime,
+                DateCreatedTimeTo = DateTime.Now
+            };
+            List<DOTFile> dOTQueriedFilesRecentOneDay = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", fileQueryConditions);
+            var distinctFolderCountOneDay = dOTQueriedFilesRecentOneDay.Select(x => x.ParentFolder).Distinct().Count();
+            String recentChangeStatistic = dOTQueriedFilesRecentOneDay.Count.ToString() + " Files, " + distinctFolderCountOneDay.ToString() + " Folders changed.";
+            Label recentChangeStatisticLabel = (Label)Controls["panelSearchPage"].Controls["recentChangeStatisticLabel"];
+            recentChangeStatisticLabel.Text = recentChangeStatistic;
+            //fill out the query results table
+            fillDataGridView(dOTQueriedFilesRecentOneDay);
+        }
+
         private void showDynamicInfo()
         {
-            //query the xml input file based on the search conditions
-            List<DOTFile> dOTQueriedFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", "", DateTime.Now.AddDays(1), DateTime.Now);
-            var distinctFolderCount = dOTQueriedFiles.Select(x => x.ParentFolder).Distinct().Count();
-            String totalFileAndFolderInfo = "There are " + dOTQueriedFiles.Count.ToString() + " files and " + distinctFolderCount.ToString() + " folders into File Management System.";
+            //[PL0218]Show past 24 hours to "now" changes
+            showPastDaysChanges(DateTime.Now.AddDays(-1));
+
+            //[PL0218]Query total file and foler info.
+            FileQueryConditions fileQueryConditions = new FileQueryConditions()
+            {
+                FileName = "",
+                DateCreatedTimeFrom = DateTime.Now.AddDays(1),
+                DateCreatedTimeTo = DateTime.Now
+            };
+            List<DOTFile> dOTQueriedFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", fileQueryConditions);
+            var distinctFolderCountAll = dOTQueriedFiles.Select(x => x.ParentFolder).Distinct().Count();
+            String totalFileAndFolderInfo = "There are " + dOTQueriedFiles.Count.ToString() + " files and " + distinctFolderCountAll.ToString() + " folders into File Management System.";
             Label totalFileAndFolderInfoLabel = (Label)Controls["panelSearchPage"].Controls["totalFileAndFolderInfoLabel"];
             totalFileAndFolderInfoLabel.Text = totalFileAndFolderInfo;
 
-            //[PL0218]Filter based on file types
-            List<DOTFile> dOTPDFFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", ".pdf", DateTime.Now.AddDays(1), DateTime.Now);
+            //[PL0218]Show counts of filter based on file types
+            fileQueryConditions.FileName = ".pdf";
+            List<DOTFile> dOTPDFFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", fileQueryConditions);
             LinkLabel linkLabelFileType1 = (LinkLabel)Controls["panelSearchPage"].Controls["linkLabelFileType1"];
             linkLabelFileType1.Text = dOTPDFFiles.Count.ToString() + " PDF Files";
             linkLabelFileType1.LinkArea = new System.Windows.Forms.LinkArea(0, dOTPDFFiles.Count.ToString().Length);
- 
-            List<DOTFile> dOTTIFFFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", ".tiff", DateTime.Now.AddDays(1), DateTime.Now);
+
+            fileQueryConditions.FileName = ".tiff";
+            List<DOTFile> dOTTIFFFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", fileQueryConditions);
             LinkLabel linkLabelFileType2 = (LinkLabel)Controls["panelSearchPage"].Controls["linkLabelFileType2"];
             linkLabelFileType2.Text = dOTTIFFFiles.Count.ToString() + " TIFF Files";
             linkLabelFileType2.LinkArea = new System.Windows.Forms.LinkArea(0, dOTTIFFFiles.Count.ToString().Length);
 
-            List<DOTFile> dOTJPGFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", ".jpg", DateTime.Now.AddDays(1), DateTime.Now);
+            fileQueryConditions.FileName = ".jpg";
+            List<DOTFile> dOTJPGFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", fileQueryConditions);
             LinkLabel linkLabelFileType3 = (LinkLabel)Controls["panelSearchPage"].Controls["linkLabelFileType3"];
             linkLabelFileType3.Text = dOTJPGFiles.Count.ToString() + " JPG Files";
             linkLabelFileType3.LinkArea = new System.Windows.Forms.LinkArea(0, dOTJPGFiles.Count.ToString().Length);
@@ -114,8 +144,32 @@ namespace FileMan
             int otherFileTypeCount = dOTQueriedFiles.Count - dOTPDFFiles.Count - dOTTIFFFiles.Count - dOTJPGFiles.Count;
             linkLabelFileType4.Text = otherFileTypeCount.ToString() + " Other Files";
             linkLabelFileType4.LinkArea = new System.Windows.Forms.LinkArea(0, otherFileTypeCount.ToString().Length);
-
         }
+
+
+        //Sample code for click link area:
+        //private void linkLabel1_LinkClicked(object sender, System.Windows.Forms.LinkLabelLinkClickedEventArgs e)
+        //{
+        //    // Determine which link was clicked within the LinkLabel.
+        //    this.linkLabel1.Links[linkLabel1.Links.IndexOf(e.Link)].Visited = true;
+
+        //    // Display the appropriate link based on the value of the 
+        //    // LinkData property of the Link object.
+        //    string target = e.Link.LinkData as string;
+
+        //    // If the value looks like a URL, navigate to it.
+        //    // Otherwise, display it in a message box.
+        //    if (null != target && target.StartsWith("www"))
+        //    {
+        //        System.Diagnostics.Process.Start(target);
+        //    }
+        //    else
+        //    {
+        //        MessageBox.Show("Item clicked: " + target);
+        //    }
+        //}
+
+
 
         private Panel createPagePanel(String panelName)
         {
@@ -178,7 +232,7 @@ namespace FileMan
                 Location = new Point(610, 30),
                 Size = new Size(28, 30)
             };
-            Searchbutton.Click += new EventHandler(Searchbutton_Click);            
+            Searchbutton.Click += new EventHandler(Searchbutton_Click);
             panelSearchPage.Controls.Add(Searchbutton);
             Searchbutton.BringToFront();
 
@@ -195,7 +249,8 @@ namespace FileMan
 
             //[PL0217]Add comboBox for past time condition
             ComboBox comboBoxChangesInPast = new ComboBox()
-            {                
+            {
+                Name = "comboBoxChangesInPast",
                 Location = new Point(325, 85),
                 Font = new Font("Segoe UI", 15)
             };
@@ -203,6 +258,7 @@ namespace FileMan
             comboBoxChangesInPast.Items.Add("2 Days");
             comboBoxChangesInPast.Items.Add("3 Days");
             comboBoxChangesInPast.SelectedIndex = 0;
+            comboBoxChangesInPast.SelectedIndexChanged += ComboBoxChangesInPast_SelectedIndexChanged;
             panelSearchPage.Controls.Add(comboBoxChangesInPast);
 
             //[PL0217]Add text info for number of files and folders changed.
@@ -281,6 +337,7 @@ namespace FileMan
                 Font = new Font("Segoe UI", 12),
                 Text = ""
             };
+            linkLabelFileType1.LinkClicked += LinkLabelFileType1_LinkClicked;
             panelSearchPage.Controls.Add(linkLabelFileType1);
 
             LinkLabel linkLabelFileType2 = new LinkLabel()
@@ -291,6 +348,7 @@ namespace FileMan
                 Font = new Font("Segoe UI", 12),
                 Text = ""
             };
+            linkLabelFileType2.LinkClicked += LinkLabelFileType2_LinkClicked;
             panelSearchPage.Controls.Add(linkLabelFileType2);
 
             LinkLabel linkLabelFileType3 = new LinkLabel()
@@ -301,6 +359,7 @@ namespace FileMan
                 Font = new Font("Segoe UI", 12),
                 Text = ""
             };
+            linkLabelFileType3.LinkClicked += LinkLabelFileType3_LinkClicked;
             panelSearchPage.Controls.Add(linkLabelFileType3);
 
             LinkLabel linkLabelFileType4 = new LinkLabel()
@@ -311,6 +370,7 @@ namespace FileMan
                 Font = new Font("Segoe UI", 12),
                 Text = ""
             };
+            linkLabelFileType4.LinkClicked += LinkLabelFileType4_LinkClicked;
             panelSearchPage.Controls.Add(linkLabelFileType4);
 
 
@@ -331,6 +391,71 @@ namespace FileMan
 
 
 
+        }
+
+        private void LinkLabelFileType4_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            //[PL0218]"Other" file type link is clicked
+
+        }
+
+        private void LinkLabelFileType3_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            FileQueryConditions fileQueryConditions = new FileQueryConditions()
+            {
+                FileName = ".jpg",
+                DateCreatedTimeFrom = DateTime.Now.AddDays(1),
+                DateCreatedTimeTo = DateTime.Now
+            };
+            List<DOTFile> dOTJPGFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", fileQueryConditions);
+            //fill out the query results table
+            fillDataGridView(dOTJPGFiles);
+        }
+
+        private void LinkLabelFileType2_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            FileQueryConditions fileQueryConditions = new FileQueryConditions()
+            {
+                FileName = ".tiff",
+                DateCreatedTimeFrom = DateTime.Now.AddDays(1),
+                DateCreatedTimeTo = DateTime.Now
+            };
+            List<DOTFile> dOTTIFFFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", fileQueryConditions);
+            //fill out the query results table
+            fillDataGridView(dOTTIFFFiles);
+
+        }
+
+        private void LinkLabelFileType1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            FileQueryConditions fileQueryConditions = new FileQueryConditions()
+            {
+                FileName = ".pdf",
+                DateCreatedTimeFrom = DateTime.Now.AddDays(1),
+                DateCreatedTimeTo = DateTime.Now
+            };
+            List<DOTFile> dOTPDFFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", fileQueryConditions);
+            //fill out the query results table
+            fillDataGridView(dOTPDFFiles);
+        }
+
+        private void ComboBoxChangesInPast_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ComboBox ComboBoxChangesInPast = (ComboBox)Controls["panelSearchPage"].Controls["ComboBoxChangesInPast"];
+            switch (ComboBoxChangesInPast.SelectedIndex)
+            {
+                case 0:
+                    showPastDaysChanges(DateTime.Now.AddDays(-1));
+                    break;
+                case 1:
+                    showPastDaysChanges(DateTime.Now.AddDays(-2));
+                    break;
+                case 2:
+                    showPastDaysChanges(DateTime.Now.AddDays(-3));
+                    break;
+                default:
+                    break;
+            }
         }
 
         private void initAddFilePageComponentsSetup()
@@ -404,12 +529,18 @@ namespace FileMan
                 warningLabel.Text = "";
                 //get from datetime
                 DateTime fromDateTime = GetDateTimeConsolidation(fromDatePortionDateTimePicker, fromTimePortionDateTimePicker);
-                
+
                 //get to datetime
                 DateTime toDateTime = GetDateTimeConsolidation(toDatePorttionDateTimePicker, toTimePortionDateTimePicker);
 
                 //query the xml input file based on the search conditions
-                List<DOTFile> dOTQueriedFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", searchCueTextBox.Text, fromDateTime, toDateTime);
+                FileQueryConditions fileQueryConditions = new FileQueryConditions()
+                {
+                    FileName = searchCueTextBox.Text,
+                    DateCreatedTimeFrom = fromDateTime,
+                    DateCreatedTimeTo = toDateTime
+                };
+                List<DOTFile> dOTQueriedFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", fileQueryConditions);
                 var distinctFolderCount = dOTQueriedFiles.Select(x => x.ParentFolder).Distinct().Count();
                 String recentChangeStatistic = dOTQueriedFiles.Count.ToString() + " Files, " + distinctFolderCount.ToString() + " Folders changed.";
                 Label recentChangeStatisticLabel = (Label)Controls["panelSearchPage"].Controls["recentChangeStatisticLabel"];
@@ -444,10 +575,11 @@ namespace FileMan
                     recentSearchLabel.Text = "Recent search term: ";
                     recentSearchLabel.Text = recentSearchLabel.Text + "\"" + keywordFirst + "\", \"" + keywordSecond + "\".";
                 }
-                else if (keywordFirst != "") {
+                else if (keywordFirst != "")
+                {
                     recentSearchLabel.Text = "Recent search term: ";
                     recentSearchLabel.Text = recentSearchLabel.Text + "\"" + keywordFirst + "\".";
-                }                
+                }
                 numberOfSearchTerm++;
             }
             else
@@ -459,20 +591,52 @@ namespace FileMan
             searchCueTextBox.Text = "";
         }
 
-        private List<DOTFile> queryInfoFromXMLInputFile(String XMLInputFileName, String fileNameKeyWord, DateTime fromDateTime, DateTime toDateTime)
+        //private List<DOTFile> queryInfoFromXMLInputFile(String XMLInputFileName, String fileNameKeyWord, DateTime fromDateTime, DateTime toDateTime)
+        private List<DOTFile> queryInfoFromXMLInputFile(String XMLInputFileName, FileQueryConditions fileQueryConditions)
         {
             List<DOTFile> dOTFiles = new List<DOTFile>();
             XElement root = XElement.Load(XMLInputFileName);
-            var selected = from cli in root.Elements("row").Elements("var")
-                           where (string)cli.Attribute("name").Value == "Name" && cli.Attribute("value").Value.Contains(fileNameKeyWord) == true
-                           select cli.Parent;
-
-            foreach (var d in selected)
+            DateTime fromDateTime = fileQueryConditions.DateCreatedTimeFrom;
+            DateTime toDateTime = fileQueryConditions.DateCreatedTimeTo;
+            String fileNameKeyWord = fileQueryConditions.FileName;
+            if (fromDateTime <= toDateTime)
             {
-                DOTFile dOTFile = queryInfoForOneFile(d);
-                dOTFiles.Add(dOTFile);
+                var selectedForTextFilter = from cli in root.Elements("row").Elements("var")
+                                            where (string)cli.Attribute("name").Value == "Name" && cli.Attribute("value").Value.Contains(fileNameKeyWord) == true
+                                            select cli.Parent;
+
+                var selectedForTextFilterAndCreatedFromTime = from cli in selectedForTextFilter.Elements("var")
+                                                              where (string)cli.Attribute("name").Value == "DateCreated" && DateTime.Parse(cli.Attribute("value").Value).CompareTo(fromDateTime) >= 0
+                                                              select cli.Parent;
+                var selectedForTextFilterAndCreatedFromAndToTime = from cli in selectedForTextFilterAndCreatedFromTime.Elements("var")
+                                                                   where (string)cli.Attribute("name").Value == "DateCreated" && DateTime.Parse(cli.Attribute("value").Value).CompareTo(toDateTime) <= 0
+                                                                   select cli.Parent;
+                //var selected = from cli in root.Elements("row").Elements("var")
+                //               where (string)cli.Attribute("name").Value == "Name" && cli.Attribute("value").Value.Contains(fileNameKeyWord) == true
+                //               where (string)cli.Attribute("name").Value == "DateCreated" && DateTime.Parse(cli.Attribute("value").Value).CompareTo(fromDateTime) >= 0
+                //               where (string)cli.Attribute("name").Value == "DateCreated" && DateTime.Parse(cli.Attribute("value").Value).CompareTo(toDateTime) <= 0
+                //               select cli.Parent;
+                foreach (var d in selectedForTextFilterAndCreatedFromAndToTime)
+                {
+                    DOTFile dOTFile = queryInfoForOneFile(d);
+                    dOTFiles.Add(dOTFile);
+                }
+                return dOTFiles;
             }
-            return dOTFiles;
+            else
+            {
+                var selected = from cli in root.Elements("row").Elements("var")
+                               where (string)cli.Attribute("name").Value == "Name" && cli.Attribute("value").Value.Contains(fileNameKeyWord) == true
+                               select cli.Parent;
+                foreach (var d in selected)
+                {
+                    DOTFile dOTFile = queryInfoForOneFile(d);
+                    dOTFiles.Add(dOTFile);
+                }
+                return dOTFiles;
+            }
+
+
         }
 
         private DOTFile queryInfoForOneFile(dynamic oneFileXMLContent)
