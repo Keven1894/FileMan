@@ -29,8 +29,8 @@ namespace FileMan
             InitializeComponent();
             initComponentsSetup();
             showDynamicInfo();
-            //only show the mainForm search part.
-            this.Size = new Size(816, 854);
+            //this.Size = new Size(816, 854);
+            this.Size = new Size(816, 954);
             ScrollBar vScrollBar1 = new VScrollBar();
             vScrollBar1.Dock = DockStyle.Right;
             //vScrollBar1.Scroll += (sender, e) => { flowLayoutPanel.VerticalScroll.Value = vScrollBar1.Value; };
@@ -46,7 +46,7 @@ namespace FileMan
             Panel panelMenu = new Panel()
             {
                 Location = new Point(23, 15),
-                Size = new Size(140, 90),
+                Size = new Size(300, 45),
                 BorderStyle = BorderStyle.None,
                 Name = "FlowLayoutPanel",
                 TabIndex = 0
@@ -59,10 +59,12 @@ namespace FileMan
                 Font = new Font("Segoe UI Semilight", 24),
                 AutoSize = true
             };
+            radioButtonSearch.Checked = true;
+            radioButtonSearch.CheckedChanged += RadioButtonSearch_CheckedChanged;
             RadioButton radioButtonAddFile = new RadioButton()
             {
                 Text = "Add File",
-                Location = new Point(5, 45),
+                Location = new Point(150, 0),
                 Font = new Font("Segoe UI Semilight", 24),
                 AutoSize = true
             };
@@ -78,11 +80,25 @@ namespace FileMan
             Label labelFooter = new Label()
             {
                 Text = "About the File Management System | Copyright 2017 \u00A9 FDOT Traffic Operations, District Six",
-                Location = new Point(23, 790),
+                Location = new Point(23, 890),
                 AutoSize = true,
                 Font = new Font("Segoe UI", 10)
             };
             this.Controls.Add(labelFooter);
+        }
+
+        private void RadioButtonSearch_CheckedChanged(object sender, EventArgs e)
+        {
+            Panel panelSearchPage = (Panel)Controls["panelSearchPage"];
+            Panel panelAddFilePage = (Panel)Controls["panelAddFilePage"];
+            if (panelSearchPage.Visible == true)
+            {
+                panelSearchPage.Visible = false;
+            }
+            else
+            {
+                panelSearchPage.Visible = true;
+            }
         }
 
         private void showPastDaysChanges(DateTime fromDateTime)
@@ -152,11 +168,9 @@ namespace FileMan
             {
                 Name = panelName,
                 Location = new Point(23, 80),
-                Size = new Size(760, 700),
-                BorderStyle = BorderStyle.FixedSingle,
-                TabIndex = 0
+                Size = new Size(760, 800),
+                BorderStyle = BorderStyle.None
             };
-
             return panel;
         }
 
@@ -174,6 +188,7 @@ namespace FileMan
                 Size = new Size(93, 40),
                 AutoSize = true
             };
+            buttonAdvanced.Click += ButtonAdvanced_Click;
             panelSearchPage.Controls.Add(buttonAdvanced);
 
             //[PL0217]Add cueText search.
@@ -183,7 +198,8 @@ namespace FileMan
                 Cue = "Search",
                 Font = new Font("Segoe UI", 15),
                 Location = new Point(207, 28),
-                Size = new Size(435, 30)
+                Size = new Size(435, 30),
+                TabIndex = 0
             };
             panelSearchPage.Controls.Add(searchCueTextBox);
 
@@ -348,24 +364,214 @@ namespace FileMan
             linkLabelFileType4.LinkClicked += LinkLabelFileType4_LinkClicked;
             panelSearchPage.Controls.Add(linkLabelFileType4);
 
+            DataGridView dataGridView1 = new DataGridView()
+            {
+                Name = "dataGridView1",
+                Size = new Size(728, 335),
+                Location = new Point(15, 280),
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+                AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells,
+                ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize,
+                Font = new Font("Segoe UI", 10)
+            };
+            panelSearchPage.Controls.Add(dataGridView1);
 
             //[PL0217]Add panel for advanced search
             Panel panelAdvancedSearch = new Panel()
             {
-                Location = new Point(23, 230),
-                Size = new Size(300, 300),
+                Location = new Point(100, 76),
+                Size = new Size(545, 400),
                 BorderStyle = BorderStyle.FixedSingle,
                 Name = "panelAdvancedSearch",
-                TabIndex = 0
+                
             };
             panelAdvancedSearch.Visible = false;
+
+            //[PL0218]Add components to advanced search panel
+            Label documentTitleLabel = new Label()
+            {
+                Name = "documentTitleLabel",
+                Location = new Point(10, 20),
+                Font = new Font("Segoe UI", 10),
+                AutoSize = true,
+                Text = "Document Title"
+            };
+            panelAdvancedSearch.Controls.Add(documentTitleLabel);
+            TextBox documentTitleTextBox = new TextBox()
+            {
+                Name = "documentTitleTextBox",
+                Location = new Point(10, 40),
+                Font = new Font("Segoe UI", 12),
+                Size = new Size(520, 20),
+                AutoSize = true,
+                Text = ""
+            };
+            panelAdvancedSearch.Controls.Add(documentTitleTextBox);
+
+            Label fMLabel = new Label()
+            {
+                Name = "fMLabel",
+                Location = new Point(10, 80),
+                Font = new Font("Segoe UI", 10),
+                AutoSize = true,
+                Text = "Project FM Number (FM)"
+            };
+            panelAdvancedSearch.Controls.Add(fMLabel);
+            TextBox fMTextBox = new TextBox()
+            {
+                Name = "fMTextBox",
+                Location = new Point(10, 100),
+                Font = new Font("Segoe UI", 12),
+                Size = new Size(200, 20),
+                AutoSize = true,
+                Text = ""
+            };
+            panelAdvancedSearch.Controls.Add(fMTextBox);
+
+            Label sRLabel = new Label()
+            {
+                Name = "sRLabel",
+                Location = new Point(328, 80),
+                Font = new Font("Segoe UI", 10),
+                AutoSize = true,
+                Text = "State Road (SR)"
+            };
+            panelAdvancedSearch.Controls.Add(sRLabel);
+            TextBox sRTextBox = new TextBox()
+            {
+                Name = "sRTextBox",
+                Location = new Point(328, 100),
+                Font = new Font("Segoe UI", 12),
+                Size = new Size(200, 20),
+                AutoSize = true,
+                Text = ""
+            };
+            panelAdvancedSearch.Controls.Add(sRTextBox);
+
+            Label studyTypeLabel = new Label()
+            {
+                Name = "studyTypeLabel",
+                Location = new Point(10, 140),
+                Font = new Font("Segoe UI", 10),
+                AutoSize = true,
+                Text = "Study Type"
+            };
+            panelAdvancedSearch.Controls.Add(studyTypeLabel);
+            TextBox studyTypeTextBox = new TextBox()
+            {
+                Name = "studyType",
+                Location = new Point(10, 160),
+                Font = new Font("Segoe UI", 12),
+                Size = new Size(520, 20),
+                AutoSize = true,
+                Text = ""
+            };
+            panelAdvancedSearch.Controls.Add(studyTypeTextBox);
+
+            Label descriptionLabel = new Label()
+            {
+                Name = "descriptionLabel",
+                Location = new Point(10, 200),
+                Font = new Font("Segoe UI", 10),
+                AutoSize = true,
+                Text = "Description"
+            };
+            panelAdvancedSearch.Controls.Add(descriptionLabel);
+            TextBox descriptionTextBox = new TextBox()
+            {
+                Name = "descriptionTextBox",
+                Location = new Point(10, 220),
+                Font = new Font("Segoe UI", 12),
+                Size = new Size(520, 20),
+                AutoSize = true,
+                Text = ""
+            };
+            panelAdvancedSearch.Controls.Add(descriptionTextBox);
+
+            Label authorLabel = new Label()
+            {
+                Name = "authorLabel",
+                Location = new Point(10, 260),
+                Font = new Font("Segoe UI", 10),
+                AutoSize = true,
+                Text = "Author"
+            };
+            panelAdvancedSearch.Controls.Add(authorLabel);
+            TextBox authorTextBox = new TextBox()
+            {
+                Name = "authorTextBox",
+                Location = new Point(10, 280),
+                Font = new Font("Segoe UI", 12),
+                Size = new Size(520, 20),
+                AutoSize = true,
+                Text = ""
+            };
+            panelAdvancedSearch.Controls.Add(authorTextBox);
+
+            Label createdTimeFromLabel = new Label()
+            {
+                Name = "createdTimeFromLabel",
+                Location = new Point(10, 320),
+                Font = new Font("Segoe UI", 10),
+                AutoSize = true,
+                Text = "From"
+            };
+            panelAdvancedSearch.Controls.Add(createdTimeFromLabel);
+
+            DateTimePicker createdTimeFromDateTimePicker = new DateTimePicker()
+            {
+                Name = "createdTimeFromDateTimePicker",
+                Location = new Point(10, 340),
+                Font = new Font("Segoe UI", 12),
+                Size = new Size(200 , 20)
+
+            };
+            createdTimeFromDateTimePicker.Format = DateTimePickerFormat.Custom;
+            createdTimeFromDateTimePicker.CustomFormat = "MM/dd/yyyy";
+            panelAdvancedSearch.Controls.Add(createdTimeFromDateTimePicker);
+
+            Label createdTimeToLabel = new Label()
+            {
+                Name = "createdTimeToLabel",
+                Location = new Point(328, 320),
+                Font = new Font("Segoe UI", 10),
+                AutoSize = true,
+                Text = "To"
+            };
+            panelAdvancedSearch.Controls.Add(createdTimeToLabel);
+            DateTimePicker createdTimeToDateTimePicker = new DateTimePicker()
+            {
+                Name = "createdTimeToDateTimePicker",
+                Location = new Point(328, 340),
+                Font = new Font("Segoe UI", 12),
+                Size = new Size(200, 20)
+            };
+            createdTimeToDateTimePicker.Format = DateTimePickerFormat.Custom;
+            createdTimeToDateTimePicker.CustomFormat = "MM/dd/yyyy";
+            panelAdvancedSearch.Controls.Add(createdTimeToDateTimePicker);
+
+
             panelSearchPage.Controls.Add(panelAdvancedSearch);
+            panelAdvancedSearch.BringToFront();
             this.Controls.Add(panelSearchPage);
 
 
 
 
 
+        }
+
+        private void ButtonAdvanced_Click(object sender, EventArgs e)
+        {
+            Panel panelAdvancedSearch = (Panel)Controls["panelSearchPage"].Controls["panelAdvancedSearch"];
+            if (panelAdvancedSearch.Visible == true)
+            {
+                panelAdvancedSearch.Visible = false;
+            }
+            else
+            {
+                panelAdvancedSearch.Visible = true;
+            }
         }
 
         private void LinkLabelFileType4_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -441,12 +647,198 @@ namespace FileMan
             }
         }
 
+        private void createSingleSetAdditionalItem(String title, String textBoxName, String warning, Point location)
+        {
+            Label labelTitle = new Label()
+            {
+                Name = title,
+                Font = new Font("Segoe UI", 15),
+                Location = location,
+                AutoSize = true,
+                Text = title
+            };
+            Controls["panelAddFilePage"].Controls.Add(labelTitle);
+
+            TextBox textBoxContent = new TextBox()
+            {
+                Name = textBoxName,
+                Location = new Point(location.X, location.Y + 35),
+                Font = new Font("Segoe UI", 15),
+                Size = new Size(315, 20),
+                AutoSize = true,
+                Text = ""
+            };
+            Controls["panelAddFilePage"].Controls.Add(textBoxContent);
+            Label labelWarning = new Label()
+            {
+                Name = warning,
+                Font = new Font("Seravek", 8, FontStyle.Italic),
+                Location = new Point(location.X -2 , textBoxContent.Location.Y + 45),
+                AutoSize = true,
+                Text = warning
+            };
+            Controls["panelAddFilePage"].Controls.Add(labelWarning);
+        }
+
         private void initAddFilePageComponentsSetup()
         {
             //[PL0217]Create a big panel for all "Add File" components.
-            Panel panelSearchPage = createPagePanel("panelSearchPage");
+            Panel panelAddFilePage = createPagePanel("panelAddFilePage");
+
+            int startingXPoint = 25;
+            int startingYPoint = 0;
+            //[PL0217]Add button for advanced search.
+            Button buttonSelectFile = new Button()
+            {
+                Text = "Select File",
+                Font = new Font("Segoe UI", 15),
+                Location = new Point(startingXPoint, startingYPoint),
+                Size = new Size(120, 40),
+                AutoSize = false
+            };
+            buttonSelectFile.Click += ButtonSelectFile_Click;
+            panelAddFilePage.Controls.Add(buttonSelectFile);
+
+            LinkLabel linkLabelPath = new LinkLabel()
+            {
+                Name = "linkLabelPath",
+                AutoSize = true,
+                Location = new Point(startingXPoint + 200, startingYPoint + 5),
+                Font = new Font("Segoe UI", 15),
+                Text = "Path: "
+            };
+            linkLabelPath.LinkClicked += LinkLabelPath_LinkClicked;
+            panelAddFilePage.Controls.Add(linkLabelPath);
+
+            Label labelInOrderTo = new Label()
+            {
+                Name = "labelInOrderTo",
+                Font = new Font("Seravek", 10, FontStyle.Italic),
+                Location = new Point(startingXPoint, startingYPoint + 60),
+                AutoSize = true,
+                Text = "In order to save the file please complete the following fields"
+            };
+            panelAddFilePage.Controls.Add(labelInOrderTo);
+
+            this.Controls.Add(panelAddFilePage);
+            createSingleSetAdditionalItem("Section Number*", "textBoxSectionNumber", "Please make sure to enter the eight digits section number.", Location = new Point(startingXPoint, startingYPoint + 60 + 30));
+            createSingleSetAdditionalItem("State Road (SR)*", "textBoxSR", "Type only the number.", Location = new Point(startingXPoint + 375, startingYPoint + 60 + 30));
+
+            createSingleSetAdditionalItem("Study Type*", "comboBoxStudyType", "Select one study type.", Location = new Point(startingXPoint, startingYPoint + 200));
+            createSingleSetAdditionalItem("Location*", "comboBoxLocation", "Select one location type.", Location = new Point(startingXPoint + 375, startingYPoint + 200));
+
+            createSingleSetAdditionalItem("Beginning Milepost*", "textBoxBeginningMilepost", "Enter only Milepost digits and double the numbers to avoid errors" + Environment.NewLine + "into the system.", Location = new Point(startingXPoint, startingYPoint + 310));
+            TextBox textBoxBeginningMilepost = (TextBox)Controls["panelAddFilePage"].Controls["textBoxBeginningMilepost"];
+            textBoxBeginningMilepost.Size = new Size(120, 20);
+
+            createSingleSetAdditionalItem("Ending Milepost*", "textBoxEndingMilepost", "", Location = new Point(startingXPoint + 195, startingYPoint + 310));
+            TextBox textBoxEndingMilepost = (TextBox)Controls["panelAddFilePage"].Controls["textBoxEndingMilepost"];
+            textBoxEndingMilepost.Size = new Size(120, 20);
+
+            createSingleSetAdditionalItem("FM Number*", "textBoxFMNumber", "Enter the number, including \"-\".", Location = new Point(startingXPoint + 375, startingYPoint + 310));
+
+            createSingleSetAdditionalItem("Author*", "textBoxAuthor", "Add the author of the report. For instance, consultant company name.", Location = new Point(startingXPoint, startingYPoint + 430));
+            createSingleSetAdditionalItem("Key words", "textBoxKeyWords", "Add key words improve results in document searches.", Location = new Point(startingXPoint + 375, startingYPoint + 430));
 
 
+
+            Label labelFileName = new Label()
+            {
+                Name = "labelFileName",
+                Font = new Font("Segoe UI Semibold", 15, FontStyle.Bold),
+                Location = new Point(startingXPoint, startingYPoint + 540),
+                AutoSize = false,
+                BackColor = Color.Pink,
+                Size = new Size(690, 30),
+                Text = "File Name: "
+            };
+            panelAddFilePage.Controls.Add(labelFileName);
+
+            LinkLabel linkLabelFileNameStructure = new LinkLabel()
+            {
+                Name = "linkLabelFileNameStructure",
+                Font = new Font("Seravek", 8, FontStyle.Italic),
+                Location = new Point(startingXPoint + 560, startingYPoint + 575),
+                AutoSize = true,
+                Text = "About File Name Structure."
+            };
+            panelAddFilePage.Controls.Add(linkLabelFileNameStructure);
+
+            Label labelFileInfo = new Label()
+            {
+                Name = "labelFileInfo",
+                Font = new Font("Segoe UI", 15),
+                Location = new Point(startingXPoint, startingYPoint + 585),
+                AutoSize = true,
+                Text = "File Info"
+            };
+            panelAddFilePage.Controls.Add(labelFileInfo);
+
+            //Label labelComments = new Label()
+            //{
+            //    Name = "labelComments",
+            //    Font = new Font("Segoe UI", 15),
+            //    Location = new Point(startingXPoint + 375, startingYPoint + 585),
+            //    AutoSize = true,
+            //    Text = "Comments"
+            //};
+            //panelAddFilePage.Controls.Add(labelComments);
+
+            Label labelFileInfoContent = new Label()
+            {
+                Name = "labelFileInfoContent",
+                Font = new Font("Segoe UI", 15),
+                Location = new Point(startingXPoint, startingYPoint + 620),
+                AutoSize = false,
+                BackColor = Color.Gray,
+                Size = new Size(315, 130),
+                Text = "File Info Details..."
+            };
+            panelAddFilePage.Controls.Add(labelFileInfoContent);
+
+            createSingleSetAdditionalItem("Comments", "textBoxComments", "Add important comments related to the study.", Location = new Point(startingXPoint + 375, startingYPoint + 585));
+            TextBox textBoxComments = (TextBox)Controls["panelAddFilePage"].Controls["textBoxComments"];
+            textBoxComments.Multiline = true;
+            textBoxComments.Size = new Size(315, 80);
+            Label labelComments = (Label)Controls["panelAddFilePage"].Controls["Add important comments related to the study."];
+            labelComments.Location = new Point(textBoxComments.Location.X - 2, textBoxComments.Location.Y + 95);
+
+            Label labelRequiredField = new Label()
+            {
+                Name = "labelRequiredField",
+                Font = new Font("Segoe UI", 12),
+                Location = new Point(startingXPoint, startingYPoint + 760),
+                AutoSize = true,
+                Text = "* Required Field"
+            };
+            panelAddFilePage.Controls.Add(labelRequiredField);
+
+            Button buttonSave = new Button()
+            {
+                Name = "buttonSave",
+                Font = new Font("Segoe UI", 15),
+                Location = new Point(startingXPoint + 570, startingYPoint + 740),
+                Size = new Size(120, 40),
+                AutoSize = false,
+                Text = "Save"
+            };
+            buttonSave.Click += ButtonSave_Click;
+            panelAddFilePage.Controls.Add(buttonSave);
+        }
+
+        private void ButtonSave_Click(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void LinkLabelPath_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void ButtonSelectFile_Click(object sender, EventArgs e)
+        {
+            //throw new NotImplementedException();
         }
 
         private void setButtonOutlookAsLabel(Button button)
@@ -502,6 +894,10 @@ namespace FileMan
         String keywordThird = "";
         private void Searchbutton_Click(object sender, EventArgs e)
         {
+            //[PL0218]Hide advanced search if it is visible.
+            Panel panelAdvancedSearch = (Panel)Controls["panelSearchPage"].Controls["panelAdvancedSearch"];
+            panelAdvancedSearch.Visible = false;
+
             //[PL0217]Refer to the dynamic created component
             CueTextBox searchCueTextBox = (CueTextBox)Controls["panelSearchPage"].Controls["searchCueTextBox"];
             Label warningLabel = (Label)Controls["panelSearchPage"].Controls["warningLabel"];
@@ -511,23 +907,23 @@ namespace FileMan
             {
                 warningLabel.Text = "";
                 //get from datetime
-                DateTime fromDateTime = GetDateTimeConsolidation(fromDatePortionDateTimePicker, fromTimePortionDateTimePicker);
+                //DateTime fromDateTime = GetDateTimeConsolidation(fromDatePortionDateTimePicker, fromTimePortionDateTimePicker);
 
                 //get to datetime
-                DateTime toDateTime = GetDateTimeConsolidation(toDatePorttionDateTimePicker, toTimePortionDateTimePicker);
+                //DateTime toDateTime = GetDateTimeConsolidation(toDatePorttionDateTimePicker, toTimePortionDateTimePicker);
 
                 //query the xml input file based on the search conditions
                 FileQueryConditions fileQueryConditions = new FileQueryConditions()
                 {
                     FileName = searchCueTextBox.Text,
-                    DateCreatedTimeFrom = fromDateTime,
-                    DateCreatedTimeTo = toDateTime
+                    DateCreatedTimeFrom = DateTime.Now.AddDays(1),
+                    DateCreatedTimeTo = DateTime.Now
                 };
                 List<DOTFile> dOTQueriedFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", fileQueryConditions);
-                var distinctFolderCount = dOTQueriedFiles.Select(x => x.ParentFolder).Distinct().Count();
-                String recentChangeStatistic = dOTQueriedFiles.Count.ToString() + " Files, " + distinctFolderCount.ToString() + " Folders changed.";
-                Label recentChangeStatisticLabel = (Label)Controls["panelSearchPage"].Controls["recentChangeStatisticLabel"];
-                recentChangeStatisticLabel.Text = recentChangeStatistic;
+                //var distinctFolderCount = dOTQueriedFiles.Select(x => x.ParentFolder).Distinct().Count();
+                //String recentChangeStatistic = dOTQueriedFiles.Count.ToString() + " Files, " + distinctFolderCount.ToString() + " Folders changed.";
+                //Label recentChangeStatisticLabel = (Label)Controls["panelSearchPage"].Controls["recentChangeStatisticLabel"];
+                //recentChangeStatisticLabel.Text = recentChangeStatistic;
 
                 //fill out the query results table
                 fillDataGridView(dOTQueriedFiles);
@@ -585,7 +981,7 @@ namespace FileMan
             if (fromDateTime <= toDateTime)
             {
                 var selectedForTextFilter = from cli in root.Elements("row").Elements("var")
-                                            where (string)cli.Attribute("name").Value == "Name" && cli.Attribute("value").Value.Contains(fileNameKeyWord) == true
+                                            where (string)cli.Attribute("name").Value == "Name" && cli.Attribute("value").Value.ToUpper().Contains(fileNameKeyWord.ToUpper()) == true
                                             select cli.Parent;
 
                 var selectedForTextFilterAndCreatedFromTime = from cli in selectedForTextFilter.Elements("var")
@@ -608,9 +1004,9 @@ namespace FileMan
                 //[PL0218]this is not a good way, need to dynamic generate the filter conditon, instead of hardcode.
                 var selected = from cli in root.Elements("row").Elements("var")
                                where (string)cli.Attribute("name").Value == "Name" && 
-                               (cli.Attribute("value").Value.Contains(fileQueryConditions.FileNameNotContain[0]) == true ||
-                               cli.Attribute("value").Value.Contains(fileQueryConditions.FileNameNotContain[1]) == true ||
-                               cli.Attribute("value").Value.Contains(fileQueryConditions.FileNameNotContain[2]) == true)
+                               (cli.Attribute("value").Value.ToUpper().Contains(fileQueryConditions.FileNameNotContain[0].ToUpper()) == true ||
+                               cli.Attribute("value").Value.ToUpper().Contains(fileQueryConditions.FileNameNotContain[1].ToUpper()) == true ||
+                               cli.Attribute("value").Value.ToUpper().Contains(fileQueryConditions.FileNameNotContain[2].ToUpper()) == true)
                                select cli.Parent;
                 foreach (var d in fullList.Except(selected))
                 {
@@ -622,7 +1018,7 @@ namespace FileMan
             else
             {
                 var selected = from cli in root.Elements("row").Elements("var")
-                               where (string)cli.Attribute("name").Value == "Name" && cli.Attribute("value").Value.Contains(fileNameKeyWord) == true
+                               where (string)cli.Attribute("name").Value == "Name" && cli.Attribute("value").Value.ToUpper().Contains(fileNameKeyWord.ToUpper()) == true
                                select cli.Parent;
                 foreach (var d in selected)
                 {
@@ -666,8 +1062,9 @@ namespace FileMan
 
         private void fillDataGridView(List<DOTFile> dOTQueriedFiles)
         {
-            var fileNameAndPath = dOTQueriedFiles.Select(i => new { i.Name, i.ParentFolder }).ToArray();
-            dataGridView1.DataSource = fileNameAndPath;
+            var queriedDataSource = dOTQueriedFiles.Select(i => new {i.Name, i.ParentFolder, Ext = (String)i.Name.Split('.').Last()}).ToArray();
+            DataGridView dataGridView1 = (DataGridView)Controls["panelSearchPage"].Controls["dataGridView1"];
+            dataGridView1.DataSource = queriedDataSource;
             //dataGridView1.DataBind();
 
 
