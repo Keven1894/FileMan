@@ -16,19 +16,13 @@ namespace FileMan
 {
     public partial class mainForm : Form
     {
-        //FlowLayoutPanel flowLayoutPanel = new FlowLayoutPanel
-        //{
-        //    Location = new Point(23, 230),
-        //    Size = new Size(300, 300),
-        //    BorderStyle = BorderStyle.FixedSingle,
-        //    Name = "FlowLayoutPanel",
-        //    TabIndex = 0
-        //};
+        //[PL0218]Used for selected file.
+        string sSelectedFile;
+        string newFileName = "SectionNo_SRxx_StudyType_Location_MPxx_xx.suffix";
         public mainForm()
         {
             InitializeComponent();
             initComponentsSetup();
-            showDynamicInfo();
             //this.Size = new Size(816, 854);
             this.Size = new Size(816, 954);
             ScrollBar vScrollBar1 = new VScrollBar();
@@ -38,6 +32,7 @@ namespace FileMan
             //this.Controls.Add(flowLayoutPanel);
             //obtain the input file and check if it is the latest one
             Boolean inputFileStatus = CheckTheInputFileStatus();
+            showDynamicInfo();
         }
 
         private void initComponentsSetup()
@@ -383,7 +378,7 @@ namespace FileMan
                 Size = new Size(545, 400),
                 BorderStyle = BorderStyle.FixedSingle,
                 Name = "panelAdvancedSearch",
-                
+
             };
             panelAdvancedSearch.Visible = false;
 
@@ -523,7 +518,7 @@ namespace FileMan
                 Name = "createdTimeFromDateTimePicker",
                 Location = new Point(10, 340),
                 Font = new Font("Segoe UI", 12),
-                Size = new Size(200 , 20)
+                Size = new Size(200, 20)
 
             };
             createdTimeFromDateTimePicker.Format = DateTimePickerFormat.Custom;
@@ -673,7 +668,7 @@ namespace FileMan
             {
                 Name = warning,
                 Font = new Font("Seravek", 8, FontStyle.Italic),
-                Location = new Point(location.X -2 , textBoxContent.Location.Y + 45),
+                Location = new Point(location.X - 2, textBoxContent.Location.Y + 45),
                 AutoSize = true,
                 Text = warning
             };
@@ -703,9 +698,12 @@ namespace FileMan
             {
                 Name = "linkLabelPath",
                 AutoSize = true,
-                Location = new Point(startingXPoint + 200, startingYPoint + 5),
-                Font = new Font("Segoe UI", 15),
-                Text = "Path: "
+                Location = new Point(startingXPoint + 180, startingYPoint + 5),
+                Font = new Font("Segoe UI", 12),
+                Text = "Path: ",
+                MaximumSize = new Size(520, 0)
+
+
             };
             linkLabelPath.LinkClicked += LinkLabelPath_LinkClicked;
             panelAddFilePage.Controls.Add(linkLabelPath);
@@ -722,6 +720,10 @@ namespace FileMan
 
             this.Controls.Add(panelAddFilePage);
             createSingleSetAdditionalItem("Section Number*", "textBoxSectionNumber", "Please make sure to enter the eight digits section number.", Location = new Point(startingXPoint, startingYPoint + 60 + 30));
+            TextBox textBoxSectionNumber = (TextBox)Controls["panelAddFilePage"].Controls["textBoxSectionNumber"];
+            textBoxSectionNumber.MaxLength = 8;
+            textBoxSectionNumber.TextChanged += TextBoxSectionNumber_TextChanged;
+            textBoxSectionNumber.KeyPress += TextBoxSectionNumber_KeyPress;
             createSingleSetAdditionalItem("State Road (SR)*", "textBoxSR", "Type only the number.", Location = new Point(startingXPoint + 375, startingYPoint + 60 + 30));
 
             createSingleSetAdditionalItem("Study Type*", "comboBoxStudyType", "Select one study type.", Location = new Point(startingXPoint, startingYPoint + 200));
@@ -750,7 +752,7 @@ namespace FileMan
                 AutoSize = false,
                 BackColor = Color.Pink,
                 Size = new Size(690, 30),
-                Text = "File Name: "
+                Text = "File Name: " + newFileName
             };
             panelAddFilePage.Controls.Add(labelFileName);
 
@@ -787,7 +789,7 @@ namespace FileMan
             Label labelFileInfoContent = new Label()
             {
                 Name = "labelFileInfoContent",
-                Font = new Font("Segoe UI", 15),
+                Font = new Font("Segoe UI", 11),
                 Location = new Point(startingXPoint, startingYPoint + 620),
                 AutoSize = false,
                 BackColor = Color.Gray,
@@ -826,19 +828,94 @@ namespace FileMan
             panelAddFilePage.Controls.Add(buttonSave);
         }
 
+        private void TextBoxSectionNumber_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            //[0219]Only allow numbers to keyin
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void TextBoxSectionNumber_TextChanged(object sender, EventArgs e)
+        {
+            TextBox textBoxSectionNumber = (TextBox)Controls["panelAddFilePage"].Controls["textBoxSectionNumber"];
+
+            Label labelFileName = (Label)Controls["panelAddFilePage"].Controls["labelFileName"];
+
+            labelFileName.Text = labelFileName.Text.Split(':')[0] + ": " + textBoxSectionNumber.Text
+                + "_" + labelFileName.Text.Split(':')[1].Split('_')[1]
+                + "_" + labelFileName.Text.Split(':')[1].Split('_')[2]
+                + "_" + labelFileName.Text.Split(':')[1].Split('_')[3]
+                + "_" + labelFileName.Text.Split(':')[1].Split('_')[4]
+                + "_" + labelFileName.Text.Split(':')[1].Split('_')[5];
+        }
+
         private void ButtonSave_Click(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            //[PL0218]Destination folder should read from config file
+            string fileToCopy = sSelectedFile;
+            string destinationDirectory = ".\\dummyDest\\";
+
+            //File.Copy(fileToCopy, destinationDirectory + Path.GetFileName(fileToCopy));
+            Label labelFileName = (Label)Controls["panelAddFilePage"].Controls["labelFileName"];
+            File.Copy(fileToCopy, destinationDirectory + labelFileName.Text.Split(':')[1]);
         }
 
         private void LinkLabelPath_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+        }
+
+        private string getFileSizeHumanReadable(long fileLength)
+        {
+            string sLen = fileLength.ToString();
+            if (fileLength >= (1 << 30))
+                sLen = string.Format("{0}Gb", fileLength >> 30);
+            else
+            if (fileLength >= (1 << 20))
+                sLen = string.Format("{0}Mb", fileLength >> 20);
+            else
+            if (fileLength >= (1 << 10))
+                sLen = string.Format("{0}Kb", fileLength >> 10);
+            else
+                sLen = string.Format("{0}byte", fileLength);
+
+            return sLen;
         }
 
         private void ButtonSelectFile_Click(object sender, EventArgs e)
         {
-            //throw new NotImplementedException();
+            OpenFileDialog choofdlog = new OpenFileDialog();
+            choofdlog.Filter = "All Files (*.*)|*.*";
+            choofdlog.FilterIndex = 1;
+            choofdlog.Multiselect = true;
+
+            if (choofdlog.ShowDialog() == DialogResult.OK)
+            {
+                sSelectedFile = choofdlog.FileName;
+                LinkLabel linkLabelPath = (LinkLabel)Controls["panelAddFilePage"].Controls["linkLabelPath"];
+                linkLabelPath.Text += sSelectedFile;
+                Label labelFileInfoContent = (Label)Controls["panelAddFilePage"].Controls["labelFileInfoContent"];
+                FileInfo fileInfo = new FileInfo(sSelectedFile);
+
+                labelFileInfoContent.Text = "Date Created: " + fileInfo.CreationTime
+                    + Environment.NewLine
+                    + "Date Modified: " + fileInfo.LastWriteTime
+                    + Environment.NewLine
+                    + "Size: " + getFileSizeHumanReadable(fileInfo.Length)
+                    + Environment.NewLine
+                    + "Type: " + Path.GetFileName(sSelectedFile).Split('.').Last();
+
+                //newFileName = "." + sSelectedFile.Split('.').Last();
+                //Label labelFileName = (Label)Controls["panelAddFilePage"].Controls["labelFileName"];
+                //labelFileName.Text = "File Name: ";
+                //labelFileName.Text += newFileName;
+            }
+            else
+            {
+                sSelectedFile = string.Empty;
+            }
         }
 
         private void setButtonOutlookAsLabel(Button button)
@@ -851,10 +928,19 @@ namespace FileMan
 
         private Boolean CheckTheInputFileStatus()
         {
-            string csv = File.ReadAllText("./inputFile/FileInfoSummary.csv");
-            XDocument doc = ConverstorCsvToXml.ConvertCsvToXML(csv, new[] { "\",\"" });
-            doc.Save("./inputFile/outputxml.xml");
+            String XMLInputFile = "./inputFile/outputxml.xml";
+            if (!File.Exists(XMLInputFile))
+            {
 
+                string csv = File.ReadAllText("./inputFile/FileInfoSummary.csv");
+                XDocument doc = ConverstorCsvToXml.ConvertCsvToXML(csv, new[] { "\",\"" });
+                doc.Save(XMLInputFile);
+            }
+            else
+            {
+                //XML file exists already
+                ///TODO
+            }
 
             return true;
         }
@@ -1003,7 +1089,7 @@ namespace FileMan
                                select cli.Parent;
                 //[PL0218]this is not a good way, need to dynamic generate the filter conditon, instead of hardcode.
                 var selected = from cli in root.Elements("row").Elements("var")
-                               where (string)cli.Attribute("name").Value == "Name" && 
+                               where (string)cli.Attribute("name").Value == "Name" &&
                                (cli.Attribute("value").Value.ToUpper().Contains(fileQueryConditions.FileNameNotContain[0].ToUpper()) == true ||
                                cli.Attribute("value").Value.ToUpper().Contains(fileQueryConditions.FileNameNotContain[1].ToUpper()) == true ||
                                cli.Attribute("value").Value.ToUpper().Contains(fileQueryConditions.FileNameNotContain[2].ToUpper()) == true)
@@ -1062,7 +1148,7 @@ namespace FileMan
 
         private void fillDataGridView(List<DOTFile> dOTQueriedFiles)
         {
-            var queriedDataSource = dOTQueriedFiles.Select(i => new {i.Name, i.ParentFolder, Ext = (String)i.Name.Split('.').Last()}).ToArray();
+            var queriedDataSource = dOTQueriedFiles.Select(i => new { i.Name, i.ParentFolder, Ext = (String)i.Name.Split('.').Last() }).ToArray();
             DataGridView dataGridView1 = (DataGridView)Controls["panelSearchPage"].Controls["dataGridView1"];
             dataGridView1.DataSource = queriedDataSource;
             //dataGridView1.DataBind();
@@ -1144,19 +1230,10 @@ namespace FileMan
             //}
         }
 
-        private void searchResultGroupBox_Enter(object sender, EventArgs e)
-        {
-
-        }
-
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
 
         }
 
-        private void descriptionLabel3_Click(object sender, EventArgs e)
-        {
-
-        }
     }
 }
