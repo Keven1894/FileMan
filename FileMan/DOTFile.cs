@@ -18,6 +18,15 @@ namespace FileMan
         public string Type { get; set; }
         public string Suffix { get; set; }
         public string Owner { get; set; }
-
+        public string SectionNumber { get; set; }
+        public string SR { get; set; }
+        public string StudyType { get; set; }
+        public string Location { get; set; }
+        public string BeginningMilepost { get; set; }
+        public string EndingMilepost { get; set; }
+        public string FM { get; set; }
+        public string Author { get; set; }
+        public string KeyWords { get; set; }
+        public string Comments { get; set; }
     }
 }

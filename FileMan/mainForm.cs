@@ -19,6 +19,8 @@ namespace FileMan
         //[PL0218]Used for selected file.
         string sSelectedFile;
         string newFileName = "SectionNo_SRxx_StudyType_Location_MPxx_xx.suffix";
+        //[PL0219]New file to save
+        DOTFile dOTFileNewSave = new DOTFile();
         public mainForm()
         {
             InitializeComponent();
@@ -725,6 +727,9 @@ namespace FileMan
             textBoxSectionNumber.TextChanged += TextBoxSectionNumber_TextChanged;
             textBoxSectionNumber.KeyPress += TextBoxSectionNumber_KeyPress;
             createSingleSetAdditionalItem("State Road (SR)*", "textBoxSR", "Type only the number.", Location = new Point(startingXPoint + 375, startingYPoint + 60 + 30));
+            TextBox textBoxSR = (TextBox)Controls["panelAddFilePage"].Controls["textBoxSR"];
+            textBoxSR.TextChanged += TextBoxSR_TextChanged;
+            textBoxSR.KeyPress += TextBoxSR_KeyPress;
 
             createSingleSetAdditionalItem("Study Type*", "comboBoxStudyType", "Select one study type.", Location = new Point(startingXPoint, startingYPoint + 200));
             createSingleSetAdditionalItem("Location*", "comboBoxLocation", "Select one location type.", Location = new Point(startingXPoint + 375, startingYPoint + 200));
@@ -776,16 +781,6 @@ namespace FileMan
             };
             panelAddFilePage.Controls.Add(labelFileInfo);
 
-            //Label labelComments = new Label()
-            //{
-            //    Name = "labelComments",
-            //    Font = new Font("Segoe UI", 15),
-            //    Location = new Point(startingXPoint + 375, startingYPoint + 585),
-            //    AutoSize = true,
-            //    Text = "Comments"
-            //};
-            //panelAddFilePage.Controls.Add(labelComments);
-
             Label labelFileInfoContent = new Label()
             {
                 Name = "labelFileInfoContent",
@@ -828,6 +823,30 @@ namespace FileMan
             panelAddFilePage.Controls.Add(buttonSave);
         }
 
+        private void TextBoxSR_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            //[0219]Only allow numbers to keyin
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void TextBoxSR_TextChanged(object sender, EventArgs e)
+        {
+            TextBox textBoxSR = (TextBox)Controls["panelAddFilePage"].Controls["textBoxSR"];
+
+            Label labelFileName = (Label)Controls["panelAddFilePage"].Controls["labelFileName"];
+
+            labelFileName.Text = labelFileName.Text.Split(':')[0] + ":"
+                + labelFileName.Text.Split(':')[1].Split('_')[0]
+                + "_" + "SR" + textBoxSR.Text
+                + "_" + labelFileName.Text.Split(':')[1].Split('_')[2]
+                + "_" + labelFileName.Text.Split(':')[1].Split('_')[3]
+                + "_" + labelFileName.Text.Split(':')[1].Split('_')[4]
+                + "_" + labelFileName.Text.Split(':')[1].Split('_')[5];
+        }
+
         private void TextBoxSectionNumber_KeyPress(object sender, KeyPressEventArgs e)
         {
             //[0219]Only allow numbers to keyin
@@ -851,15 +870,81 @@ namespace FileMan
                 + "_" + labelFileName.Text.Split(':')[1].Split('_')[5];
         }
 
+        private string getContentFromTextBoxInOnePanel(String panelName, String textBoxName)
+        {
+            TextBox foundTextBoxName = (TextBox)Controls[panelName].Controls[textBoxName];
+            return foundTextBoxName.Text;
+        }
+
         private void ButtonSave_Click(object sender, EventArgs e)
         {
             //[PL0218]Destination folder should read from config file
             string fileToCopy = sSelectedFile;
             string destinationDirectory = ".\\dummyDest\\";
 
-            //File.Copy(fileToCopy, destinationDirectory + Path.GetFileName(fileToCopy));
-            Label labelFileName = (Label)Controls["panelAddFilePage"].Controls["labelFileName"];
-            File.Copy(fileToCopy, destinationDirectory + labelFileName.Text.Split(':')[1]);
+            LinkLabel linkLabelPath = (LinkLabel)Controls["panelAddFilePage"].Controls["linkLabelPath"];
+            if (linkLabelPath.Text.Length == 6)
+            {
+                MessageBox.Show("Please select a file before save.");
+            }
+            else
+            {
+                //File.Copy(fileToCopy, destinationDirectory + Path.GetFileName(fileToCopy));
+                Label labelFileName = (Label)Controls["panelAddFilePage"].Controls["labelFileName"];
+                string fileNewName = labelFileName.Text.Split(':')[1].Trim();
+                File.Copy(fileToCopy, destinationDirectory + fileNewName);
+
+                //[PL0219]Get file additional properties.
+                dOTFileNewSave.SectionNumber = getContentFromTextBoxInOnePanel("panelAddFilePage", "textBoxSectionNumber");
+                dOTFileNewSave.SR = getContentFromTextBoxInOnePanel("panelAddFilePage", "textBoxSR");
+                dOTFileNewSave.StudyType = getContentFromTextBoxInOnePanel("panelAddFilePage", "comboBoxStudyType");
+                dOTFileNewSave.Location = getContentFromTextBoxInOnePanel("panelAddFilePage", "comboBoxLocation");
+                dOTFileNewSave.BeginningMilepost = getContentFromTextBoxInOnePanel("panelAddFilePage", "textBoxBeginningMilepost");
+                dOTFileNewSave.EndingMilepost = getContentFromTextBoxInOnePanel("panelAddFilePage", "textBoxEndingMilepost");
+                dOTFileNewSave.FM = getContentFromTextBoxInOnePanel("panelAddFilePage", "textBoxFMNumber");
+                dOTFileNewSave.Author = getContentFromTextBoxInOnePanel("panelAddFilePage", "textBoxAuthor");
+                dOTFileNewSave.KeyWords = getContentFromTextBoxInOnePanel("panelAddFilePage", "textBoxKeyWords");
+                dOTFileNewSave.Comments = getContentFromTextBoxInOnePanel("panelAddFilePage", "textBoxComments");
+
+                String XMLInputFile = "./inputFile/outputxml.xml";
+                if (File.Exists(XMLInputFile))
+                {
+                    var doc = XDocument.Load(XMLInputFile);
+
+                    var newFileElement = new XElement("row",
+                        new XElement("var", new XAttribute("name", "FilePathAndName"), new XAttribute("value", dOTFileNewSave.FilePathAndName)),
+                        new XElement("var", new XAttribute("name", "ParentFolder"), new XAttribute("value", dOTFileNewSave.ParentFolder)),
+                        new XElement("var", new XAttribute("name", "Name"), new XAttribute("value", fileNewName)),
+                        new XElement("var", new XAttribute("name", "DateCreated"), new XAttribute("value", new DateTime())),
+                        new XElement("var", new XAttribute("name", "DateLastAccessed"), new XAttribute("value", dOTFileNewSave.DateLastAccessed)),
+                        new XElement("var", new XAttribute("name", "DateLastModified"), new XAttribute("value", dOTFileNewSave.DateLastModified)),
+                        new XElement("var", new XAttribute("name", "Size"), new XAttribute("value", dOTFileNewSave.Size)),
+                        new XElement("var", new XAttribute("name", "Type"), new XAttribute("value", dOTFileNewSave.Type)),
+                        new XElement("var", new XAttribute("name", "Suffix"), new XAttribute("value", dOTFileNewSave.Suffix)),
+                        new XElement("var", new XAttribute("name", "Owner"), new XAttribute("value", dOTFileNewSave.Owner)),
+                        new XElement("var", new XAttribute("name", "SectionNumber"), new XAttribute("value", dOTFileNewSave.SectionNumber)),
+                        new XElement("var", new XAttribute("name", "SR"), new XAttribute("value", dOTFileNewSave.SR)),
+                        new XElement("var", new XAttribute("name", "StudyType"), new XAttribute("value", dOTFileNewSave.StudyType)),
+                        new XElement("var", new XAttribute("name", "Location"), new XAttribute("value", dOTFileNewSave.Location)),
+                        new XElement("var", new XAttribute("name", "BeginningMilepost"), new XAttribute("value", dOTFileNewSave.BeginningMilepost)),
+                        new XElement("var", new XAttribute("name", "EndingMilepost"), new XAttribute("value", dOTFileNewSave.EndingMilepost)),
+                        new XElement("var", new XAttribute("name", "FM"), new XAttribute("value", dOTFileNewSave.FM)),
+                        new XElement("var", new XAttribute("name", "Author"), new XAttribute("value", dOTFileNewSave.Author)),
+                        new XElement("var", new XAttribute("name", "KeyWords"), new XAttribute("value", dOTFileNewSave.KeyWords)),
+                        new XElement("var", new XAttribute("name", "Comments"), new XAttribute("value", dOTFileNewSave.Comments))
+                        );
+                    doc.Element("root").Add(newFileElement);
+                    doc.Save(XMLInputFile);
+
+                    MessageBox.Show("File \"" + fileNewName + "\" is successfully saved.");
+                }
+                else
+                {
+                    //XML does not exist.
+                    ///TODO
+                }
+
+            }
         }
 
         private void LinkLabelPath_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -907,10 +992,17 @@ namespace FileMan
                     + Environment.NewLine
                     + "Type: " + Path.GetFileName(sSelectedFile).Split('.').Last();
 
-                //newFileName = "." + sSelectedFile.Split('.').Last();
-                //Label labelFileName = (Label)Controls["panelAddFilePage"].Controls["labelFileName"];
-                //labelFileName.Text = "File Name: ";
-                //labelFileName.Text += newFileName;
+                ///TODO, [PL0219]Here needs to save the new file path, instead of the old one.
+                dOTFileNewSave.FilePathAndName = sSelectedFile;
+                dOTFileNewSave.ParentFolder = Path.GetFullPath(sSelectedFile);
+                ///TODO, [PL0219]Only get the old fileinfo
+                dOTFileNewSave.DateLastAccessed = fileInfo.LastAccessTime.ToString();
+                dOTFileNewSave.DateLastModified = fileInfo.LastWriteTime.ToString();
+                dOTFileNewSave.Size = getFileSizeHumanReadable(fileInfo.Length);
+                dOTFileNewSave.Type = fileInfo.GetType().ToString();
+                dOTFileNewSave.Suffix = Path.GetFileName(sSelectedFile).Split('.').Last();
+                dOTFileNewSave.Owner = File.GetAccessControl(sSelectedFile).GetOwner(typeof(System.Security.Principal.NTAccount)).ToString();
+
             }
             else
             {
@@ -1185,11 +1277,6 @@ namespace FileMan
         }
 
         private void mainForm_Load(object sender, EventArgs e)
-        {
-
-        }
-
-        private void DescriptionLabel2_Click(object sender, EventArgs e)
         {
 
         }
