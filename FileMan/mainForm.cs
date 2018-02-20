@@ -1531,6 +1531,16 @@ namespace FileMan
             dOTFile.Type = queryInfoForFileAttribute(fileAttributes, "Type");
             dOTFile.Suffix = queryInfoForFileAttribute(fileAttributes, "Suffix");
             dOTFile.Owner = queryInfoForFileAttribute(fileAttributes, "Owner");
+            dOTFile.SectionNumber = queryInfoForFileAttribute(fileAttributes, "SectionNumber");
+            dOTFile.SR = queryInfoForFileAttribute(fileAttributes, "SR");
+            dOTFile.StudyType = queryInfoForFileAttribute(fileAttributes, "StudyType");
+            dOTFile.Location = queryInfoForFileAttribute(fileAttributes, "Location");
+            dOTFile.BeginningMilepost = queryInfoForFileAttribute(fileAttributes, "BeginningMilepost");
+            dOTFile.EndingMilepost = queryInfoForFileAttribute(fileAttributes, "EndingMilepost");
+            dOTFile.FM = queryInfoForFileAttribute(fileAttributes, "FM");
+            dOTFile.Author = queryInfoForFileAttribute(fileAttributes, "Author");
+            dOTFile.KeyWords = queryInfoForFileAttribute(fileAttributes, "KeyWords");
+            dOTFile.Comments = queryInfoForFileAttribute(fileAttributes, "Comments");
             return dOTFile;
         }
 
@@ -1552,7 +1562,18 @@ namespace FileMan
             PictureBox.CheckForIllegalCrossThreadCalls = false;
             pictureBoxLoadingIcon.Visible = true;
             //pictureBoxLoadingIcon.Update();
-            var queriedDataSource = dOTQueriedFiles.Select(i => new { i.Name, i.ParentFolder, Ext = (String)i.Name.Split('.').Last() }).ToArray();
+            var queriedDataSource = dOTQueriedFiles.Select(i => new {
+                i.Name,
+                i.ParentFolder,
+                i.Location,
+                i.StudyType,
+                i.Comments,
+                i.KeyWords,
+                i.FM,
+                i.SR,
+                i.Author,
+                Ext = (String)i.Name.Split('.').Last()
+            }).ToArray();
             DataGridView dataGridView1 = (DataGridView)Controls["panelSearchPage"].Controls["dataGridView1"];
             //dataGridView1.Rows.Clear();
             dataGridView1.Refresh();
