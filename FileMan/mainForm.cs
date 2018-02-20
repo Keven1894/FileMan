@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using System.Xml.Linq;
-using System.Drawing.Drawing2D;
-using System.Collections;
+using iTextSharp.text.pdf;
 
 namespace FileMan
 {
@@ -734,6 +730,7 @@ namespace FileMan
             createSingleSetAdditionalItem("Study Type*", "comboBoxStudyType", "Select one study type.", Location = new Point(startingXPoint, startingYPoint + 200));
             createSingleSetAdditionalItem("Location*", "comboBoxLocation", "Select one location type.", Location = new Point(startingXPoint + 375, startingYPoint + 200));
 
+
             createSingleSetAdditionalItem("Beginning Milepost*", "textBoxBeginningMilepost", "Enter only Milepost digits and double the numbers to avoid errors" + Environment.NewLine + "into the system.", Location = new Point(startingXPoint, startingYPoint + 310));
             TextBox textBoxBeginningMilepost = (TextBox)Controls["panelAddFilePage"].Controls["textBoxBeginningMilepost"];
             textBoxBeginningMilepost.Size = new Size(120, 20);
@@ -743,6 +740,8 @@ namespace FileMan
             textBoxEndingMilepost.Size = new Size(120, 20);
 
             createSingleSetAdditionalItem("FM Number*", "textBoxFMNumber", "Enter the number, including \"-\".", Location = new Point(startingXPoint + 375, startingYPoint + 310));
+            TextBox textBoxFMNumber = (TextBox)Controls["panelAddFilePage"].Controls["textBoxFMNumber"];
+            textBoxFMNumber.KeyPress += TextBoxFMNumber_KeyPress;
 
             createSingleSetAdditionalItem("Author*", "textBoxAuthor", "Add the author of the report. For instance, consultant company name.", Location = new Point(startingXPoint, startingYPoint + 430));
             createSingleSetAdditionalItem("Key words", "textBoxKeyWords", "Add key words improve results in document searches.", Location = new Point(startingXPoint + 375, startingYPoint + 430));
@@ -823,14 +822,38 @@ namespace FileMan
             panelAddFilePage.Controls.Add(buttonSave);
         }
 
+        private void TextBoxFMNumber_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            Label labelFM = (Label)Controls["panelAddFilePage"].Controls["Enter the number, including \"-\"."];
+            //[0219]Only allow numbers to keyin
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && (e.KeyChar != '-'))
+            {
+                e.Handled = true;
+                labelFM.ForeColor = Color.Red;
+            }
+            else
+            {
+                labelFM.ForeColor = Color.Black;
+            }
+        }
+
         private void TextBoxSR_KeyPress(object sender, KeyPressEventArgs e)
         {
+
+            Label labelSR = (Label)Controls["panelAddFilePage"].Controls["Type only the number."];
             //[0219]Only allow numbers to keyin
             if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
             {
                 e.Handled = true;
+                labelSR.ForeColor = Color.Red;
+            }
+            else {
+                labelSR.ForeColor = Color.Black;
             }
         }
+
+
+
 
         private void TextBoxSR_TextChanged(object sender, EventArgs e)
         {
@@ -849,10 +872,16 @@ namespace FileMan
 
         private void TextBoxSectionNumber_KeyPress(object sender, KeyPressEventArgs e)
         {
+            Label labelSectionNumber = (Label)Controls["panelAddFilePage"].Controls["Please make sure to enter the eight digits section number."];
             //[0219]Only allow numbers to keyin
             if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
             {
                 e.Handled = true;
+                labelSectionNumber.ForeColor = Color.Red;
+            }
+            else
+            {
+                labelSectionNumber.ForeColor = Color.Black;
             }
         }
 
@@ -885,7 +914,7 @@ namespace FileMan
             LinkLabel linkLabelPath = (LinkLabel)Controls["panelAddFilePage"].Controls["linkLabelPath"];
             if (linkLabelPath.Text.Length == 6)
             {
-                MessageBox.Show("Please select a file before save.");
+                MessageBox.Show("Please select a file before save.", "Warning");
             }
             else
             {
@@ -936,7 +965,7 @@ namespace FileMan
                     doc.Element("root").Add(newFileElement);
                     doc.Save(XMLInputFile);
 
-                    MessageBox.Show("File \"" + fileNewName + "\" is successfully saved.");
+                    MessageBox.Show("File \"" + fileNewName + "\" is successfully saved.", "Info");
                 }
                 else
                 {
@@ -983,14 +1012,39 @@ namespace FileMan
                 linkLabelPath.Text += sSelectedFile;
                 Label labelFileInfoContent = (Label)Controls["panelAddFilePage"].Controls["labelFileInfoContent"];
                 FileInfo fileInfo = new FileInfo(sSelectedFile);
+                string fileSuffix = Path.GetFileName(sSelectedFile).Split('.').Last();
+                string numberOfPages = "";
+                if (fileSuffix.ToUpper() == "PDF")
+                {
+                    PdfReader pdfReader = new PdfReader(sSelectedFile);
+                    numberOfPages = pdfReader.NumberOfPages.ToString();
+                }
+                if (fileSuffix.ToUpper() == "DOCX")
+                {
+                    //// Open a doc file.
+                    //var application = new Application();
+                    //var document = application.Documents.Open(@"C:\Users\MyName\Documents\word.docx");
+
+                    //// Get the page count.
+                    //var numberOfPages = document.ComputeStatistics(WdStatistic.wdStatisticPages, false);
+
+                    //// Close word.
+                    //application.Quit();
+                }
 
                 labelFileInfoContent.Text = "Date Created: " + fileInfo.CreationTime
                     + Environment.NewLine
                     + "Date Modified: " + fileInfo.LastWriteTime
                     + Environment.NewLine
+                    + "Page: " + numberOfPages
+                    + Environment.NewLine
                     + "Size: " + getFileSizeHumanReadable(fileInfo.Length)
                     + Environment.NewLine
-                    + "Type: " + Path.GetFileName(sSelectedFile).Split('.').Last();
+                    + "Type: " + fileSuffix;
+
+                Label labelFileName = (Label)Controls["panelAddFilePage"].Controls["labelFileName"];
+
+                labelFileName.Text = labelFileName.Text.Replace("suffix" , fileSuffix);
 
                 ///TODO, [PL0219]Here needs to save the new file path, instead of the old one.
                 dOTFileNewSave.FilePathAndName = sSelectedFile;
