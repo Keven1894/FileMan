@@ -7,6 +7,9 @@ using System.Windows.Forms;
 using System.IO;
 using System.Xml.Linq;
 using iTextSharp.text.pdf;
+using System.Threading.Tasks;
+using System.Threading;
+using System.ComponentModel;
 
 namespace FileMan
 {
@@ -17,10 +20,18 @@ namespace FileMan
         string newFileName = "SectionNo_SRxx_StudyType_Location_MPxx_xx.suffix";
         //[PL0219]New file to save
         DOTFile dOTFileNewSave = new DOTFile();
+        BackgroundWorker backgroundWorker = new BackgroundWorker();
+
         public mainForm()
         {
             InitializeComponent();
             initComponentsSetup();
+
+            backgroundWorker.DoWork += BackgroundWorker_DoWork;
+            backgroundWorker.RunWorkerCompleted += BackgroundWorker_RunWorkerCompleted;
+
+
+
             //this.Size = new Size(816, 854);
             this.Size = new Size(816, 954);
             ScrollBar vScrollBar1 = new VScrollBar();
@@ -295,7 +306,7 @@ namespace FileMan
             Label totalFileAndFolderInfoLabel = new Label()
             {
                 Name = "totalFileAndFolderInfoLabel",
-                Location = new Point(10, 616),
+                Location = new Point(10, 716),
                 Font = new Font("Segoe UI Semibold", 15, FontStyle.Bold),
                 AutoSize = true,
                 Text = "There are"
@@ -305,7 +316,7 @@ namespace FileMan
             //[PL0218]Add horizontal line
             Panel useAsHorizontalLine = new Panel()
             {
-                Location = new Point(13, 645),
+                Location = new Point(13, 745),
                 Size = new Size(735, 1),
                 BorderStyle = BorderStyle.FixedSingle,
                 Name = "useAsHorizontalLine"
@@ -317,7 +328,7 @@ namespace FileMan
             {
                 Name = "linkLabelFileType1",
                 AutoSize = true,
-                Location = new Point(13, 657),
+                Location = new Point(13, 757),
                 Font = new Font("Segoe UI", 12),
                 Text = ""
             };
@@ -328,7 +339,7 @@ namespace FileMan
             {
                 Name = "linkLabelFileType2",
                 AutoSize = true,
-                Location = new Point(150, 657),
+                Location = new Point(150, 757),
                 Font = new Font("Segoe UI", 12),
                 Text = ""
             };
@@ -339,7 +350,7 @@ namespace FileMan
             {
                 Name = "linkLabelFileType3",
                 AutoSize = true,
-                Location = new Point(300, 657),
+                Location = new Point(300, 757),
                 Font = new Font("Segoe UI", 12),
                 Text = ""
             };
@@ -350,7 +361,7 @@ namespace FileMan
             {
                 Name = "linkLabelFileType4",
                 AutoSize = true,
-                Location = new Point(450, 657),
+                Location = new Point(450, 757),
                 Font = new Font("Segoe UI", 12),
                 Text = ""
             };
@@ -360,7 +371,7 @@ namespace FileMan
             DataGridView dataGridView1 = new DataGridView()
             {
                 Name = "dataGridView1",
-                Size = new Size(728, 335),
+                Size = new Size(728, 435),
                 Location = new Point(15, 280),
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
                 AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells,
@@ -368,6 +379,28 @@ namespace FileMan
                 Font = new Font("Segoe UI", 10)
             };
             panelSearchPage.Controls.Add(dataGridView1);
+
+            //ProgressBar progressBar = new ProgressBar()
+            //{
+            //    Name = "progressBar",
+            //    Size = new Size(300, 50),
+            //    Location = new Point(15, 280),
+            //    Font = new Font("Segoe UI", 10),
+            //    Value = 0,
+            //    Maximum = 1000
+            //};
+            //panelSearchPage.Controls.Add(progressBar);
+
+            PictureBox pictureBoxLoadingIcon = new PictureBox()
+            {
+                Name = "pictureBoxLoadingIcon",
+                Size = new Size(40, 40),
+                Location = new Point(350, 500),
+                Image = Image.FromFile(@".\assets\img\loading.gif"),
+
+            };
+            panelSearchPage.Controls.Add(pictureBoxLoadingIcon);
+            pictureBoxLoadingIcon.BringToFront();
 
             //[PL0217]Add panel for advanced search
             Panel panelAdvancedSearch = new Panel()
@@ -554,6 +587,27 @@ namespace FileMan
 
         }
 
+        private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            Button Searchbutton = (Button)Controls["panelSearchPage"].Controls["Searchbutton"];
+            Searchbutton.Enabled = true;
+            PictureBox pictureBoxLoadingIcon = (PictureBox)Controls["panelSearchPage"].Controls["pictureBoxLoadingIcon"];
+            pictureBoxLoadingIcon.Hide();
+        }
+
+        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            //query the xml input file based on the search conditions
+            FileQueryConditions fileQueryConditions = new FileQueryConditions()
+            {
+                FileName = (string)e.Argument,
+                DateCreatedTimeFrom = DateTime.Now.AddDays(1),
+                DateCreatedTimeTo = DateTime.Now
+            };
+            var dOTQueriedFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", fileQueryConditions);
+            fillDataGridView(dOTQueriedFiles);
+        }
+
         private void ButtonAdvanced_Click(object sender, EventArgs e)
         {
             Panel panelAdvancedSearch = (Panel)Controls["panelSearchPage"].Controls["panelAdvancedSearch"];
@@ -576,9 +630,13 @@ namespace FileMan
                 DateCreatedTimeFrom = DateTime.Now.AddDays(1),
                 DateCreatedTimeTo = DateTime.Now
             };
+            PictureBox pictureBoxLoadingIcon = (PictureBox)Controls["panelSearchPage"].Controls["pictureBoxLoadingIcon"];
+            pictureBoxLoadingIcon.Show();
+            pictureBoxLoadingIcon.Update();
             List<DOTFile> dOTOtherFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", fileQueryConditions);
             //fill out the query results table
             fillDataGridView(dOTOtherFiles);
+            pictureBoxLoadingIcon.Hide();
         }
 
         private void LinkLabelFileType3_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -640,7 +698,7 @@ namespace FileMan
             }
         }
 
-        private void createSingleSetAdditionalItem(String title, String textBoxName, String warning, Point location)
+        private void createSingleSetAdditionalItem(String title, String textBoxName, String warning, Point location, bool isMandatory)
         {
             Label labelTitle = new Label()
             {
@@ -651,6 +709,19 @@ namespace FileMan
                 Text = title
             };
             Controls["panelAddFilePage"].Controls.Add(labelTitle);
+            if (isMandatory)
+            {
+                Label labelRedStar = new Label()
+                {
+                    Name = title + "RedStar",
+                    Font = new Font("Segoe UI", 15),
+                    Location = new Point(location.X + labelTitle.Size.Width - 5, location.Y),
+                    AutoSize = true,
+                    Text = "*",
+                    ForeColor = Color.Red
+                };
+                Controls["panelAddFilePage"].Controls.Add(labelRedStar);
+            }
 
             TextBox textBoxContent = new TextBox()
             {
@@ -717,34 +788,40 @@ namespace FileMan
             panelAddFilePage.Controls.Add(labelInOrderTo);
 
             this.Controls.Add(panelAddFilePage);
-            createSingleSetAdditionalItem("Section Number*", "textBoxSectionNumber", "Please make sure to enter the eight digits section number.", Location = new Point(startingXPoint, startingYPoint + 60 + 30));
+            createSingleSetAdditionalItem("Section Number", "textBoxSectionNumber", "Please make sure to enter the eight digits section number.", Location = new Point(startingXPoint, startingYPoint + 60 + 30), true);
             TextBox textBoxSectionNumber = (TextBox)Controls["panelAddFilePage"].Controls["textBoxSectionNumber"];
             textBoxSectionNumber.MaxLength = 8;
             textBoxSectionNumber.TextChanged += TextBoxSectionNumber_TextChanged;
             textBoxSectionNumber.KeyPress += TextBoxSectionNumber_KeyPress;
-            createSingleSetAdditionalItem("State Road (SR)*", "textBoxSR", "Type only the number.", Location = new Point(startingXPoint + 375, startingYPoint + 60 + 30));
+            createSingleSetAdditionalItem("State Road (SR)", "textBoxSR", "Type only the number.", Location = new Point(startingXPoint + 375, startingYPoint + 60 + 30), true);
             TextBox textBoxSR = (TextBox)Controls["panelAddFilePage"].Controls["textBoxSR"];
             textBoxSR.TextChanged += TextBoxSR_TextChanged;
             textBoxSR.KeyPress += TextBoxSR_KeyPress;
 
-            createSingleSetAdditionalItem("Study Type*", "comboBoxStudyType", "Select one study type.", Location = new Point(startingXPoint, startingYPoint + 200));
-            createSingleSetAdditionalItem("Location*", "comboBoxLocation", "Select one location type.", Location = new Point(startingXPoint + 375, startingYPoint + 200));
+            createSingleSetAdditionalItem("Study Type", "comboBoxStudyType", "Select one study type.", Location = new Point(startingXPoint, startingYPoint + 200), true);
+            createSingleSetAdditionalItem("Location", "comboBoxLocation", "Select one location type.", Location = new Point(startingXPoint + 375, startingYPoint + 200), true);
 
 
-            createSingleSetAdditionalItem("Beginning Milepost*", "textBoxBeginningMilepost", "Enter only Milepost digits and double the numbers to avoid errors" + Environment.NewLine + "into the system.", Location = new Point(startingXPoint, startingYPoint + 310));
+            createSingleSetAdditionalItem("Beginning Milepost", "textBoxBeginningMilepost", "Enter only Milepost digits and double the numbers to avoid errors" + Environment.NewLine + "into the system.", Location = new Point(startingXPoint, startingYPoint + 310), true);
             TextBox textBoxBeginningMilepost = (TextBox)Controls["panelAddFilePage"].Controls["textBoxBeginningMilepost"];
             textBoxBeginningMilepost.Size = new Size(120, 20);
+            textBoxBeginningMilepost.MaxLength = 6;
+            textBoxBeginningMilepost.TextChanged += TextBoxBeginningMilepost_TextChanged;
+            textBoxBeginningMilepost.KeyPress += TextBoxBeginningMilepost_KeyPress;
 
-            createSingleSetAdditionalItem("Ending Milepost*", "textBoxEndingMilepost", "", Location = new Point(startingXPoint + 195, startingYPoint + 310));
+            createSingleSetAdditionalItem("Ending Milepost", "textBoxEndingMilepost", "", Location = new Point(startingXPoint + 195, startingYPoint + 310), true);
             TextBox textBoxEndingMilepost = (TextBox)Controls["panelAddFilePage"].Controls["textBoxEndingMilepost"];
             textBoxEndingMilepost.Size = new Size(120, 20);
+            textBoxEndingMilepost.MaxLength = 6;
+            textBoxEndingMilepost.TextChanged += TextBoxEndingMilepost_TextChanged;
+            textBoxEndingMilepost.KeyPress += TextBoxEndingMilepost_KeyPress;
 
-            createSingleSetAdditionalItem("FM Number*", "textBoxFMNumber", "Enter the number, including \"-\".", Location = new Point(startingXPoint + 375, startingYPoint + 310));
+            createSingleSetAdditionalItem("FM Number", "textBoxFMNumber", "Enter the number, including \"-\".", Location = new Point(startingXPoint + 375, startingYPoint + 310), true);
             TextBox textBoxFMNumber = (TextBox)Controls["panelAddFilePage"].Controls["textBoxFMNumber"];
             textBoxFMNumber.KeyPress += TextBoxFMNumber_KeyPress;
 
-            createSingleSetAdditionalItem("Author*", "textBoxAuthor", "Add the author of the report. For instance, consultant company name.", Location = new Point(startingXPoint, startingYPoint + 430));
-            createSingleSetAdditionalItem("Key words", "textBoxKeyWords", "Add key words improve results in document searches.", Location = new Point(startingXPoint + 375, startingYPoint + 430));
+            createSingleSetAdditionalItem("Author", "textBoxAuthor", "Add the author of the report. For instance, consultant company name.", Location = new Point(startingXPoint, startingYPoint + 430), true);
+            createSingleSetAdditionalItem("Key words", "textBoxKeyWords", "Add key words improve results in document searches.", Location = new Point(startingXPoint + 375, startingYPoint + 430), false);
 
 
 
@@ -792,20 +869,31 @@ namespace FileMan
             };
             panelAddFilePage.Controls.Add(labelFileInfoContent);
 
-            createSingleSetAdditionalItem("Comments", "textBoxComments", "Add important comments related to the study.", Location = new Point(startingXPoint + 375, startingYPoint + 585));
+            createSingleSetAdditionalItem("Comments", "textBoxComments", "Add important comments related to the study.", Location = new Point(startingXPoint + 375, startingYPoint + 585), false);
             TextBox textBoxComments = (TextBox)Controls["panelAddFilePage"].Controls["textBoxComments"];
             textBoxComments.Multiline = true;
             textBoxComments.Size = new Size(315, 80);
             Label labelComments = (Label)Controls["panelAddFilePage"].Controls["Add important comments related to the study."];
             labelComments.Location = new Point(textBoxComments.Location.X - 2, textBoxComments.Location.Y + 95);
 
+            Label labelRequiredFieldStar = new Label()
+            {
+                Name = "labelRequiredFieldStar",
+                Font = new Font("Segoe UI", 12),
+                Location = new Point(startingXPoint, startingYPoint + 760),
+                AutoSize = true,
+                ForeColor = Color.Red,
+                Text = "*"
+            };
+            panelAddFilePage.Controls.Add(labelRequiredFieldStar);
+
             Label labelRequiredField = new Label()
             {
                 Name = "labelRequiredField",
                 Font = new Font("Segoe UI", 12),
-                Location = new Point(startingXPoint, startingYPoint + 760),
+                Location = new Point(startingXPoint + 13, startingYPoint + 760),
                 AutoSize = true,
-                Text = "* Required Field"
+                Text = "Required Field"
             };
             panelAddFilePage.Controls.Add(labelRequiredField);
 
@@ -820,6 +908,78 @@ namespace FileMan
             };
             buttonSave.Click += ButtonSave_Click;
             panelAddFilePage.Controls.Add(buttonSave);
+        }
+
+        private void TextBoxEndingMilepost_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            Label labelMilepost = (Label)Controls["panelAddFilePage"].Controls["Enter only Milepost digits and double the numbers to avoid errors" + Environment.NewLine + "into the system."];
+            //[0219]Only allow numbers to keyin
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && (e.KeyChar != '.'))
+            {
+                e.Handled = true;
+                labelMilepost.ForeColor = Color.Red;
+            }
+            //// only allow two decimal point
+            //else if ((e.KeyChar == '.') && ((sender as TextBox).Text.IndexOf('.') > -2))
+            //{
+            //    e.Handled = true;
+            //}
+            else
+            {
+                labelMilepost.ForeColor = Color.Black;
+            }
+        }
+
+        private void TextBoxEndingMilepost_TextChanged(object sender, EventArgs e)
+        {
+            TextBox textBoxEndingMilepost = (TextBox)Controls["panelAddFilePage"].Controls["textBoxEndingMilepost"];
+
+            Label labelFileName = (Label)Controls["panelAddFilePage"].Controls["labelFileName"];
+            string textBoxEndingMilepostText = textBoxEndingMilepost.Text;
+
+            labelFileName.Text = labelFileName.Text.Split(':')[0] + ":"
+                + labelFileName.Text.Split(':')[1].Split('_')[0]
+                + "_" + labelFileName.Text.Split(':')[1].Split('_')[1]
+                + "_" + labelFileName.Text.Split(':')[1].Split('_')[2]
+                + "_" + labelFileName.Text.Split(':')[1].Split('_')[3]
+                + "_" + labelFileName.Text.Split(':')[1].Split('_')[4]
+                + "_" + textBoxEndingMilepostText.Replace(".", "");
+        }
+
+        private void TextBoxBeginningMilepost_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            Label labelMilepost = (Label)Controls["panelAddFilePage"].Controls["Enter only Milepost digits and double the numbers to avoid errors" + Environment.NewLine + "into the system."];
+            //[0219]Only allow numbers to keyin
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && (e.KeyChar != '.'))
+            {
+                e.Handled = true;
+                labelMilepost.ForeColor = Color.Red;
+            }
+            //// only allow two decimal point
+            //else if ((e.KeyChar == '.') && ((sender as TextBox).Text.IndexOf('.') > -2))
+            //{
+            //    e.Handled = true;
+            //}
+            else
+            {
+                labelMilepost.ForeColor = Color.Black;
+            }
+        }
+
+        private void TextBoxBeginningMilepost_TextChanged(object sender, EventArgs e)
+        {
+            TextBox textBoxBeginningMilepost = (TextBox)Controls["panelAddFilePage"].Controls["textBoxBeginningMilepost"];
+
+            Label labelFileName = (Label)Controls["panelAddFilePage"].Controls["labelFileName"];
+            string textBoxBeginningMilepostText = textBoxBeginningMilepost.Text;
+
+            labelFileName.Text = labelFileName.Text.Split(':')[0] + ":"
+                + labelFileName.Text.Split(':')[1].Split('_')[0]
+                + "_" + labelFileName.Text.Split(':')[1].Split('_')[1]
+                + "_" + labelFileName.Text.Split(':')[1].Split('_')[2]
+                + "_" + labelFileName.Text.Split(':')[1].Split('_')[3]
+                + "_" + "MP" + textBoxBeginningMilepostText.Replace("." , "")
+                + "_" + labelFileName.Text.Split(':')[1].Split('_')[5];
         }
 
         private void TextBoxFMNumber_KeyPress(object sender, KeyPressEventArgs e)
@@ -847,7 +1007,8 @@ namespace FileMan
                 e.Handled = true;
                 labelSR.ForeColor = Color.Red;
             }
-            else {
+            else
+            {
                 labelSR.ForeColor = Color.Black;
             }
         }
@@ -905,6 +1066,59 @@ namespace FileMan
             return foundTextBoxName.Text;
         }
 
+        private bool checkIfMandatoryFieldsFilledOut()
+        {
+            TextBox textBoxSectionNumber = (TextBox)Controls["panelAddFilePage"].Controls["textBoxSectionNumber"];
+            TextBox textBoxSR = (TextBox)Controls["panelAddFilePage"].Controls["textBoxSR"];
+            TextBox comboBoxStudyType = (TextBox)Controls["panelAddFilePage"].Controls["comboBoxStudyType"];
+            TextBox comboBoxLocation = (TextBox)Controls["panelAddFilePage"].Controls["comboBoxLocation"];
+            TextBox textBoxBeginningMilepost = (TextBox)Controls["panelAddFilePage"].Controls["textBoxBeginningMilepost"];
+            TextBox textBoxEndingMilepost = (TextBox)Controls["panelAddFilePage"].Controls["textBoxEndingMilepost"];
+            TextBox textBoxFM = (TextBox)Controls["panelAddFilePage"].Controls["textBoxFM"];
+            TextBox textBoxAuthor = (TextBox)Controls["panelAddFilePage"].Controls["textBoxAuthor"];
+            if (textBoxSectionNumber.Text == "")
+            {
+                MessageBox.Show("Section Number is a mandatory field, please fill it out before save.", "Warning");
+                return false;
+            }
+            else if (textBoxSR.Text == "")
+            {
+                MessageBox.Show("State Road (SR) is a mandatory field, please fill it out before save.", "Warning");
+                return false;
+            }
+            else if (comboBoxStudyType.Text == "")
+            {
+                MessageBox.Show("Study Type is a mandatory field, please fill it out before save.", "Warning");
+                return false;
+            }
+            else if (comboBoxLocation.Text == "")
+            {
+                MessageBox.Show("Location is a mandatory field, please fill it out before save.", "Warning");
+                return false;
+            }
+            else if (textBoxBeginningMilepost.Text == "")
+            {
+                MessageBox.Show("Beginning Milepost is a mandatory field, please fill it out before save.", "Warning");
+                return false;
+            }
+            else if (textBoxEndingMilepost.Text == "")
+            {
+                MessageBox.Show("Ending Milepost is a mandatory field, please fill it out before save.", "Warning");
+                return false;
+            }
+            else if (textBoxFM.Text == "")
+            {
+                MessageBox.Show("FM Number is a mandatory field, please fill it out before save.", "Warning");
+                return false;
+            }
+            else if (textBoxAuthor.Text == "")
+            {
+                MessageBox.Show("Author is a mandatory field, please fill it out before save.", "Warning");
+                return false;
+            }
+            return true;
+        }
+
         private void ButtonSave_Click(object sender, EventArgs e)
         {
             //[PL0218]Destination folder should read from config file
@@ -918,61 +1132,65 @@ namespace FileMan
             }
             else
             {
-                //File.Copy(fileToCopy, destinationDirectory + Path.GetFileName(fileToCopy));
-                Label labelFileName = (Label)Controls["panelAddFilePage"].Controls["labelFileName"];
-                string fileNewName = labelFileName.Text.Split(':')[1].Trim();
-                File.Copy(fileToCopy, destinationDirectory + fileNewName);
-
-                //[PL0219]Get file additional properties.
-                dOTFileNewSave.SectionNumber = getContentFromTextBoxInOnePanel("panelAddFilePage", "textBoxSectionNumber");
-                dOTFileNewSave.SR = getContentFromTextBoxInOnePanel("panelAddFilePage", "textBoxSR");
-                dOTFileNewSave.StudyType = getContentFromTextBoxInOnePanel("panelAddFilePage", "comboBoxStudyType");
-                dOTFileNewSave.Location = getContentFromTextBoxInOnePanel("panelAddFilePage", "comboBoxLocation");
-                dOTFileNewSave.BeginningMilepost = getContentFromTextBoxInOnePanel("panelAddFilePage", "textBoxBeginningMilepost");
-                dOTFileNewSave.EndingMilepost = getContentFromTextBoxInOnePanel("panelAddFilePage", "textBoxEndingMilepost");
-                dOTFileNewSave.FM = getContentFromTextBoxInOnePanel("panelAddFilePage", "textBoxFMNumber");
-                dOTFileNewSave.Author = getContentFromTextBoxInOnePanel("panelAddFilePage", "textBoxAuthor");
-                dOTFileNewSave.KeyWords = getContentFromTextBoxInOnePanel("panelAddFilePage", "textBoxKeyWords");
-                dOTFileNewSave.Comments = getContentFromTextBoxInOnePanel("panelAddFilePage", "textBoxComments");
-
-                String XMLInputFile = "./inputFile/outputxml.xml";
-                if (File.Exists(XMLInputFile))
+                //[PL0219]Check if the mandatory fields filled out.
+                if (checkIfMandatoryFieldsFilledOut())
                 {
-                    var doc = XDocument.Load(XMLInputFile);
+                    //File.Copy(fileToCopy, destinationDirectory + Path.GetFileName(fileToCopy));
+                    Label labelFileName = (Label)Controls["panelAddFilePage"].Controls["labelFileName"];
+                    string fileNewName = labelFileName.Text.Split(':')[1].Trim();
+                    File.Copy(fileToCopy, destinationDirectory + fileNewName);
 
-                    var newFileElement = new XElement("row",
-                        new XElement("var", new XAttribute("name", "FilePathAndName"), new XAttribute("value", dOTFileNewSave.FilePathAndName)),
-                        new XElement("var", new XAttribute("name", "ParentFolder"), new XAttribute("value", dOTFileNewSave.ParentFolder)),
-                        new XElement("var", new XAttribute("name", "Name"), new XAttribute("value", fileNewName)),
-                        new XElement("var", new XAttribute("name", "DateCreated"), new XAttribute("value", new DateTime())),
-                        new XElement("var", new XAttribute("name", "DateLastAccessed"), new XAttribute("value", dOTFileNewSave.DateLastAccessed)),
-                        new XElement("var", new XAttribute("name", "DateLastModified"), new XAttribute("value", dOTFileNewSave.DateLastModified)),
-                        new XElement("var", new XAttribute("name", "Size"), new XAttribute("value", dOTFileNewSave.Size)),
-                        new XElement("var", new XAttribute("name", "Type"), new XAttribute("value", dOTFileNewSave.Type)),
-                        new XElement("var", new XAttribute("name", "Suffix"), new XAttribute("value", dOTFileNewSave.Suffix)),
-                        new XElement("var", new XAttribute("name", "Owner"), new XAttribute("value", dOTFileNewSave.Owner)),
-                        new XElement("var", new XAttribute("name", "SectionNumber"), new XAttribute("value", dOTFileNewSave.SectionNumber)),
-                        new XElement("var", new XAttribute("name", "SR"), new XAttribute("value", dOTFileNewSave.SR)),
-                        new XElement("var", new XAttribute("name", "StudyType"), new XAttribute("value", dOTFileNewSave.StudyType)),
-                        new XElement("var", new XAttribute("name", "Location"), new XAttribute("value", dOTFileNewSave.Location)),
-                        new XElement("var", new XAttribute("name", "BeginningMilepost"), new XAttribute("value", dOTFileNewSave.BeginningMilepost)),
-                        new XElement("var", new XAttribute("name", "EndingMilepost"), new XAttribute("value", dOTFileNewSave.EndingMilepost)),
-                        new XElement("var", new XAttribute("name", "FM"), new XAttribute("value", dOTFileNewSave.FM)),
-                        new XElement("var", new XAttribute("name", "Author"), new XAttribute("value", dOTFileNewSave.Author)),
-                        new XElement("var", new XAttribute("name", "KeyWords"), new XAttribute("value", dOTFileNewSave.KeyWords)),
-                        new XElement("var", new XAttribute("name", "Comments"), new XAttribute("value", dOTFileNewSave.Comments))
-                        );
-                    doc.Element("root").Add(newFileElement);
-                    doc.Save(XMLInputFile);
+                    //[PL0219]Get file additional properties.
+                    dOTFileNewSave.SectionNumber = getContentFromTextBoxInOnePanel("panelAddFilePage", "textBoxSectionNumber");
+                    dOTFileNewSave.SR = getContentFromTextBoxInOnePanel("panelAddFilePage", "textBoxSR");
+                    dOTFileNewSave.StudyType = getContentFromTextBoxInOnePanel("panelAddFilePage", "comboBoxStudyType");
+                    dOTFileNewSave.Location = getContentFromTextBoxInOnePanel("panelAddFilePage", "comboBoxLocation");
+                    dOTFileNewSave.BeginningMilepost = getContentFromTextBoxInOnePanel("panelAddFilePage", "textBoxBeginningMilepost");
+                    dOTFileNewSave.EndingMilepost = getContentFromTextBoxInOnePanel("panelAddFilePage", "textBoxEndingMilepost");
+                    dOTFileNewSave.FM = getContentFromTextBoxInOnePanel("panelAddFilePage", "textBoxFMNumber");
+                    dOTFileNewSave.Author = getContentFromTextBoxInOnePanel("panelAddFilePage", "textBoxAuthor");
+                    dOTFileNewSave.KeyWords = getContentFromTextBoxInOnePanel("panelAddFilePage", "textBoxKeyWords");
+                    dOTFileNewSave.Comments = getContentFromTextBoxInOnePanel("panelAddFilePage", "textBoxComments");
 
-                    MessageBox.Show("File \"" + fileNewName + "\" is successfully saved.", "Info");
+                    String XMLInputFile = "./inputFile/outputxml.xml";
+                    if (File.Exists(XMLInputFile))
+                    {
+                        var doc = XDocument.Load(XMLInputFile);
+
+                        var newFileElement = new XElement("row",
+                            new XElement("var", new XAttribute("name", "FilePathAndName"), new XAttribute("value", dOTFileNewSave.FilePathAndName)),
+                            new XElement("var", new XAttribute("name", "ParentFolder"), new XAttribute("value", dOTFileNewSave.ParentFolder)),
+                            new XElement("var", new XAttribute("name", "Name"), new XAttribute("value", fileNewName)),
+                            new XElement("var", new XAttribute("name", "DateCreated"), new XAttribute("value", new DateTime())),
+                            new XElement("var", new XAttribute("name", "DateLastAccessed"), new XAttribute("value", dOTFileNewSave.DateLastAccessed)),
+                            new XElement("var", new XAttribute("name", "DateLastModified"), new XAttribute("value", dOTFileNewSave.DateLastModified)),
+                            new XElement("var", new XAttribute("name", "Size"), new XAttribute("value", dOTFileNewSave.Size)),
+                            new XElement("var", new XAttribute("name", "Type"), new XAttribute("value", dOTFileNewSave.Type)),
+                            new XElement("var", new XAttribute("name", "Suffix"), new XAttribute("value", dOTFileNewSave.Suffix)),
+                            new XElement("var", new XAttribute("name", "Owner"), new XAttribute("value", dOTFileNewSave.Owner)),
+                            new XElement("var", new XAttribute("name", "SectionNumber"), new XAttribute("value", dOTFileNewSave.SectionNumber)),
+                            new XElement("var", new XAttribute("name", "SR"), new XAttribute("value", dOTFileNewSave.SR)),
+                            new XElement("var", new XAttribute("name", "StudyType"), new XAttribute("value", dOTFileNewSave.StudyType)),
+                            new XElement("var", new XAttribute("name", "Location"), new XAttribute("value", dOTFileNewSave.Location)),
+                            new XElement("var", new XAttribute("name", "BeginningMilepost"), new XAttribute("value", dOTFileNewSave.BeginningMilepost)),
+                            new XElement("var", new XAttribute("name", "EndingMilepost"), new XAttribute("value", dOTFileNewSave.EndingMilepost)),
+                            new XElement("var", new XAttribute("name", "FM"), new XAttribute("value", dOTFileNewSave.FM)),
+                            new XElement("var", new XAttribute("name", "Author"), new XAttribute("value", dOTFileNewSave.Author)),
+                            new XElement("var", new XAttribute("name", "KeyWords"), new XAttribute("value", dOTFileNewSave.KeyWords)),
+                            new XElement("var", new XAttribute("name", "Comments"), new XAttribute("value", dOTFileNewSave.Comments))
+                            );
+                        doc.Element("root").Add(newFileElement);
+                        doc.Save(XMLInputFile);
+
+                        MessageBox.Show("File \"" + fileNewName + "\" is successfully saved.", "Info");
+                    }
+                    else
+                    {
+                        //XML does not exist.
+                        ///TODO
+                    }
+
                 }
-                else
-                {
-                    //XML does not exist.
-                    ///TODO
-                }
-
             }
         }
 
@@ -1044,7 +1262,7 @@ namespace FileMan
 
                 Label labelFileName = (Label)Controls["panelAddFilePage"].Controls["labelFileName"];
 
-                labelFileName.Text = labelFileName.Text.Replace("suffix" , fileSuffix);
+                labelFileName.Text = labelFileName.Text.Replace("suffix", fileSuffix);
 
                 ///TODO, [PL0219]Here needs to save the new file path, instead of the old one.
                 dOTFileNewSave.FilePathAndName = sSelectedFile;
@@ -1126,40 +1344,26 @@ namespace FileMan
         String keywordThird = "";
         private void Searchbutton_Click(object sender, EventArgs e)
         {
+            Button Searchbutton = (Button)Controls["panelSearchPage"].Controls["Searchbutton"];
+            Searchbutton.Enabled = false;
+            PictureBox pictureBoxLoadingIcon = (PictureBox)Controls["panelSearchPage"].Controls["pictureBoxLoadingIcon"];
+            pictureBoxLoadingIcon.Show();
+            pictureBoxLoadingIcon.Update();
             //[PL0218]Hide advanced search if it is visible.
             Panel panelAdvancedSearch = (Panel)Controls["panelSearchPage"].Controls["panelAdvancedSearch"];
             panelAdvancedSearch.Visible = false;
 
             //[PL0217]Refer to the dynamic created component
             CueTextBox searchCueTextBox = (CueTextBox)Controls["panelSearchPage"].Controls["searchCueTextBox"];
-            Label warningLabel = (Label)Controls["panelSearchPage"].Controls["warningLabel"];
+            Label warningLabel = (Label)Controls["panelSearchPage"].Controls["warningLabel"];            
+
             warningLabel.Visible = false;
             //check the search key word
             if (searchCueTextBox.Text != "")
             {
                 warningLabel.Text = "";
-                //get from datetime
-                //DateTime fromDateTime = GetDateTimeConsolidation(fromDatePortionDateTimePicker, fromTimePortionDateTimePicker);
-
-                //get to datetime
-                //DateTime toDateTime = GetDateTimeConsolidation(toDatePorttionDateTimePicker, toTimePortionDateTimePicker);
-
-                //query the xml input file based on the search conditions
-                FileQueryConditions fileQueryConditions = new FileQueryConditions()
-                {
-                    FileName = searchCueTextBox.Text,
-                    DateCreatedTimeFrom = DateTime.Now.AddDays(1),
-                    DateCreatedTimeTo = DateTime.Now
-                };
-                List<DOTFile> dOTQueriedFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", fileQueryConditions);
-                //var distinctFolderCount = dOTQueriedFiles.Select(x => x.ParentFolder).Distinct().Count();
-                //String recentChangeStatistic = dOTQueriedFiles.Count.ToString() + " Files, " + distinctFolderCount.ToString() + " Folders changed.";
-                //Label recentChangeStatisticLabel = (Label)Controls["panelSearchPage"].Controls["recentChangeStatisticLabel"];
-                //recentChangeStatisticLabel.Text = recentChangeStatistic;
-
                 //fill out the query results table
-                fillDataGridView(dOTQueriedFiles);
-
+                //fillDataGridView(dOTQueriedFiles);
                 //[PL0217]Fill the recent search label.                
                 Label recentSearchLabel = (Label)Controls["panelSearchPage"].Controls["recentSearchLabel"];
                 switch (numberOfSearchTerm % 3)
@@ -1192,6 +1396,8 @@ namespace FileMan
                     recentSearchLabel.Text = recentSearchLabel.Text + "\"" + keywordFirst + "\".";
                 }
                 numberOfSearchTerm++;
+
+                backgroundWorker.RunWorkerAsync(searchCueTextBox.Text);
             }
             else
             {
@@ -1245,6 +1451,7 @@ namespace FileMan
                     DOTFile dOTFile = queryInfoForOneFile(d);
                     dOTFiles.Add(dOTFile);
                 }
+                //pictureBoxLoadingIcon.Visible = false;
                 return dOTFiles;
             }
             else
@@ -1257,6 +1464,7 @@ namespace FileMan
                     DOTFile dOTFile = queryInfoForOneFile(d);
                     dOTFiles.Add(dOTFile);
                 }
+                //pictureBoxLoadingIcon.Visible = false;
                 return dOTFiles;
             }
 
@@ -1294,14 +1502,18 @@ namespace FileMan
 
         private void fillDataGridView(List<DOTFile> dOTQueriedFiles)
         {
+            PictureBox pictureBoxLoadingIcon = (PictureBox)Controls["panelSearchPage"].Controls["pictureBoxLoadingIcon"];
+            PictureBox.CheckForIllegalCrossThreadCalls = false;
+            pictureBoxLoadingIcon.Visible = true;
+            //pictureBoxLoadingIcon.Update();
             var queriedDataSource = dOTQueriedFiles.Select(i => new { i.Name, i.ParentFolder, Ext = (String)i.Name.Split('.').Last() }).ToArray();
             DataGridView dataGridView1 = (DataGridView)Controls["panelSearchPage"].Controls["dataGridView1"];
+            //dataGridView1.Rows.Clear();
+            dataGridView1.Refresh();
             dataGridView1.DataSource = queriedDataSource;
             //dataGridView1.DataBind();
-
-
+            pictureBoxLoadingIcon.Visible = false;
         }
-
         //below function is used to change the tableLayoutPanel border color.
         private void searchResultTableLayoutPanel_CellPaint(object sender, TableLayoutCellPaintEventArgs e)
         {
