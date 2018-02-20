@@ -383,8 +383,8 @@ namespace FileMan
             DataGridView dataGridView1 = new DataGridView()
             {
                 Name = "dataGridView1",
-                Size = new Size(728, 435),
-                Location = new Point(15, 280),
+                Size = new Size(758, 435),
+                Location = new Point(0, 280),
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
                 AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells,
                 ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize,
