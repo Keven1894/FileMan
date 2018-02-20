@@ -10,6 +10,7 @@ using iTextSharp.text.pdf;
 using System.Threading.Tasks;
 using System.Threading;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace FileMan
 {
@@ -29,9 +30,6 @@ namespace FileMan
 
             backgroundWorker.DoWork += BackgroundWorker_DoWork;
             backgroundWorker.RunWorkerCompleted += BackgroundWorker_RunWorkerCompleted;
-
-
-
             //this.Size = new Size(816, 854);
             this.Size = new Size(816, 954);
             ScrollBar vScrollBar1 = new VScrollBar();
@@ -293,6 +291,20 @@ namespace FileMan
             };
             panelSearchPage.Controls.Add(recentSearchLabel);
 
+            TextBox recentSearchTextBox = new TextBox()
+            {
+                Name = "recentSearchTextBox",
+                ReadOnly = true,
+                BorderStyle = 0,
+                Location = new Point(290, 192),
+                Font = new Font("Segoe UI Semibold", 15, FontStyle.Bold),
+                BackColor = this.BackColor,
+                TabStop = false
+            };
+            recentSearchTextBox.TextChanged += RecentSearchTextBox_TextChanged;
+            panelSearchPage.Controls.Add(recentSearchTextBox);
+            recentSearchTextBox.BringToFront();
+
             Label recentFilesLabel = new Label()
             {
                 Name = "recentFilesLabel",
@@ -378,7 +390,10 @@ namespace FileMan
                 ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize,
                 Font = new Font("Segoe UI", 10)
             };
+            dataGridView1.DataBindingComplete += DataGridView1_DataBindingComplete;
+            dataGridView1.CellClick += DataGridView1_CellClick;
             panelSearchPage.Controls.Add(dataGridView1);
+
 
             //ProgressBar progressBar = new ProgressBar()
             //{
@@ -580,11 +595,41 @@ namespace FileMan
             panelSearchPage.Controls.Add(panelAdvancedSearch);
             panelAdvancedSearch.BringToFront();
             this.Controls.Add(panelSearchPage);
+        }
 
+        private void RecentSearchTextBox_TextChanged(object sender, EventArgs e)
+        {
+            TextBox recentSearchTextBox = (TextBox)Controls["panelSearchPage"].Controls["recentSearchTextBox"];
+            Size size = TextRenderer.MeasureText(recentSearchTextBox.Text, recentSearchTextBox.Font);
+            recentSearchTextBox.Width = size.Width;
+            recentSearchTextBox.Height = size.Height;
+        }
 
+        private void DataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            DataGridView dataGridView1 = (DataGridView)Controls["panelSearchPage"].Controls["dataGridView1"];
+            DataGridViewCell cell = dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex];
+            if (e.ColumnIndex == 0)
+            {
+                try
+                {//Process.Start(@"c:\");
+                    Process.Start(dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex + 1].FormattedValue.ToString());
+                }
+                catch
+                {
+                    MessageBox.Show("The folder does not exist.", "Error");
+                }
+            }
+        }
 
-
-
+        private void DataGridView1_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+        {
+            //[PL0220]This function can be used to check the content when data binding finished.
+            //DataGridView dataGridView1 = (DataGridView)Controls["panelSearchPage"].Controls["dataGridView1"];
+            //foreach (DataGridViewRow r in dataGridView1.Rows)
+            //{
+            //        r.Cells["File Name"] = new DataGridViewTextBoxCell();                
+            //}
         }
 
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -978,7 +1023,7 @@ namespace FileMan
                 + "_" + labelFileName.Text.Split(':')[1].Split('_')[1]
                 + "_" + labelFileName.Text.Split(':')[1].Split('_')[2]
                 + "_" + labelFileName.Text.Split(':')[1].Split('_')[3]
-                + "_" + "MP" + textBoxBeginningMilepostText.Replace("." , "")
+                + "_" + "MP" + textBoxBeginningMilepostText.Replace(".", "")
                 + "_" + labelFileName.Text.Split(':')[1].Split('_')[5];
         }
 
@@ -1355,7 +1400,7 @@ namespace FileMan
 
             //[PL0217]Refer to the dynamic created component
             CueTextBox searchCueTextBox = (CueTextBox)Controls["panelSearchPage"].Controls["searchCueTextBox"];
-            Label warningLabel = (Label)Controls["panelSearchPage"].Controls["warningLabel"];            
+            Label warningLabel = (Label)Controls["panelSearchPage"].Controls["warningLabel"];
 
             warningLabel.Visible = false;
             //check the search key word
@@ -1364,8 +1409,9 @@ namespace FileMan
                 warningLabel.Text = "";
                 //fill out the query results table
                 //fillDataGridView(dOTQueriedFiles);
-                //[PL0217]Fill the recent search label.                
-                Label recentSearchLabel = (Label)Controls["panelSearchPage"].Controls["recentSearchLabel"];
+                //[PL0217]Fill the recent search label.
+                //[PL0220]Change it to textbox, otherwise it cannot be selected.
+                TextBox recentSearchTextBox = (TextBox)Controls["panelSearchPage"].Controls["recentSearchTextBox"];
                 switch (numberOfSearchTerm % 3)
                 {
                     case 0:
@@ -1382,18 +1428,18 @@ namespace FileMan
                 };
                 if (keywordFirst != "" && keywordSecond != "" && keywordThird != "")
                 {
-                    recentSearchLabel.Text = "Recent search term: ";
-                    recentSearchLabel.Text = recentSearchLabel.Text + "\"" + keywordFirst + "\", \"" + keywordSecond + "\", \"" + keywordThird + "\".";
+                    recentSearchTextBox.Text = "";
+                    recentSearchTextBox.Text = recentSearchTextBox.Text + "\"" + keywordFirst + "\", \"" + keywordSecond + "\", \"" + keywordThird + "\".";
                 }
                 else if (keywordFirst != "" && keywordSecond != "")
                 {
-                    recentSearchLabel.Text = "Recent search term: ";
-                    recentSearchLabel.Text = recentSearchLabel.Text + "\"" + keywordFirst + "\", \"" + keywordSecond + "\".";
+                    recentSearchTextBox.Text = "";
+                    recentSearchTextBox.Text = recentSearchTextBox.Text + "\"" + keywordFirst + "\", \"" + keywordSecond + "\".";
                 }
                 else if (keywordFirst != "")
                 {
-                    recentSearchLabel.Text = "Recent search term: ";
-                    recentSearchLabel.Text = recentSearchLabel.Text + "\"" + keywordFirst + "\".";
+                    recentSearchTextBox.Text = "";
+                    recentSearchTextBox.Text = recentSearchTextBox.Text + "\"" + keywordFirst + "\".";
                 }
                 numberOfSearchTerm++;
 
@@ -1510,7 +1556,25 @@ namespace FileMan
             DataGridView dataGridView1 = (DataGridView)Controls["panelSearchPage"].Controls["dataGridView1"];
             //dataGridView1.Rows.Clear();
             dataGridView1.Refresh();
+            dataGridView1.DataSource = null;
+
+            DataGridViewLinkColumn col = new DataGridViewLinkColumn()
+            {
+                DataPropertyName = "Name",
+                Name = "fileName",
+                HeaderText = "File Name",
+                TrackVisitedState = true,
+                ActiveLinkColor = Color.White,
+                VisitedLinkColor = Color.YellowGreen
+                //,
+                //Frozen = false,
+                //AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            };
+
+            dataGridView1.Columns.Add(col);
+
             dataGridView1.DataSource = queriedDataSource;
+            //dataGridView1.Columns[0].Visible = false;
             //dataGridView1.DataBind();
             pictureBoxLoadingIcon.Visible = false;
         }
@@ -1582,11 +1646,5 @@ namespace FileMan
             //    row++;
             //}
         }
-
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
-
     }
 }
