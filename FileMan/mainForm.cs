@@ -30,6 +30,8 @@ namespace FileMan
             //this.Size = new Size(816, 854);
             this.Size = new Size(1000, 954);
             this.BackColor = Color.White;
+            //this.ForeColor = ColorTranslator.FromHtml("#ce2b2f");
+            //this.FormElement.TitleBar.ForeColor = ColorTranslator.FromHtml("#ce2b2f");
             ScrollBar vScrollBar1 = new VScrollBar();
             vScrollBar1.Dock = DockStyle.Right;
             //vScrollBar1.Scroll += (sender, e) => { flowLayoutPanel.VerticalScroll.Value = vScrollBar1.Value; };
@@ -46,31 +48,62 @@ namespace FileMan
             Panel panelMenu = new Panel()
             {
                 Location = new Point(23, 15),
-                Size = new Size(300, 45),
+                Size = new Size(200, 250),
                 BorderStyle = BorderStyle.None,
-                Name = "FlowLayoutPanel",
+                Name = "panelMenu",
                 TabIndex = 0
             };
-            //[PL0217]Radio buttons for menu
-            RadioButton radioButtonSearch = new RadioButton()
+
+            //[PL0221]Change the radio buttons to buttons into a panel
+            Button buttonMenuIcon = new Button()
             {
+                Name = "buttonMenuIcon",
+                Location = new Point(0, 0),
+                Font = new Font("Segoe UI Semilight", 24),
+                AutoSize = true,
+                Text = "☰",
+                FlatStyle = FlatStyle.Flat
+            };
+            buttonMenuIcon.Click += ButtonMenuIcon_Click;
+            buttonMenuIcon.FlatAppearance.BorderSize = 0;
+            buttonMenuIcon.FlatAppearance.BorderColor = Color.White;
+
+            Button buttonMenuSearch = new Button()
+            {
+                Name = "buttonMenuSearch",
                 Text = "Search",
-                Location = new Point(5, 0),
+                Location = new Point(0, 75),
                 Font = new Font("Segoe UI Semilight", 24),
-                AutoSize = true
+                AutoSize = true,
+                FlatStyle = FlatStyle.Flat,
+                BackColor = Color.White
+                
             };
-            radioButtonSearch.Checked = true;
-            radioButtonSearch.CheckedChanged += RadioButtonSearch_CheckedChanged;
-            RadioButton radioButtonAddFile = new RadioButton()
+            buttonMenuSearch.FlatAppearance.BorderSize = 0;
+            buttonMenuSearch.FlatAppearance.BorderColor = Color.White;
+            buttonMenuSearch.FlatAppearance.MouseOverBackColor = Color.White;
+            buttonMenuSearch.Click += ButtonMenuSearch_Click;
+            Button buttonMenuAddFile = new Button()
             {
+                Name = "buttonMenuAddFile",
                 Text = "Add File",
-                Location = new Point(150, 0),
+                Location = new Point(0, 135),
                 Font = new Font("Segoe UI Semilight", 24),
-                AutoSize = true
+                AutoSize = true,
+                FlatStyle = FlatStyle.Flat,
+                BackColor = Color.White
             };
-            panelMenu.Controls.Add(radioButtonSearch);
-            panelMenu.Controls.Add(radioButtonAddFile);
+            buttonMenuAddFile.Click += ButtonMenuAddFile_Click;
+            buttonMenuAddFile.FlatAppearance.BorderSize = 0;
+            buttonMenuAddFile.FlatAppearance.BorderColor = Color.White;
+            buttonMenuAddFile.FlatAppearance.MouseOverBackColor = Color.White;
+
+            panelMenu.Controls.Add(buttonMenuIcon);
+            panelMenu.Controls.Add(buttonMenuSearch);
+            panelMenu.Controls.Add(buttonMenuAddFile);
             panelMenu.Visible = true;
+            buttonMenuSearch.Visible = false;
+            buttonMenuAddFile.Visible = false;
             this.Controls.Add(panelMenu);
 
             initSearchPageComponentsSetup();
@@ -87,18 +120,29 @@ namespace FileMan
             this.Controls.Add(labelFooter);
         }
 
-        private void RadioButtonSearch_CheckedChanged(object sender, EventArgs e)
+        private void ButtonMenuAddFile_Click(object sender, EventArgs e)
         {
             Panel panelSearchPage = (Panel)Controls["panelSearchPage"];
             Panel panelAddFilePage = (Panel)Controls["panelAddFilePage"];
-            if (panelSearchPage.Visible == true)
-            {
-                panelSearchPage.Visible = false;
-            }
-            else
-            {
-                panelSearchPage.Visible = true;
-            }
+            panelSearchPage.Visible = false;
+            panelAddFilePage.Visible = true;
+        }
+
+        private void ButtonMenuSearch_Click(object sender, EventArgs e)
+        {
+            Panel panelSearchPage = (Panel)Controls["panelSearchPage"];
+            Panel panelAddFilePage = (Panel)Controls["panelAddFilePage"];
+            panelAddFilePage.Visible = false;
+            panelSearchPage.Visible = true;
+        }
+
+        private void ButtonMenuIcon_Click(object sender, EventArgs e)
+        {
+            Button buttonMenuSearch = (Button)Controls["panelMenu"].Controls["buttonMenuSearch"];
+            Button buttonMenuAddFile = (Button)Controls["panelMenu"].Controls["buttonMenuAddFile"];
+
+            buttonMenuSearch.Visible = true;
+            buttonMenuAddFile.Visible = true;
         }
 
         private void showPastDaysChanges(DateTime fromDateTime)
@@ -184,7 +228,7 @@ namespace FileMan
             {
                 Text = "Advanced",
                 Font = new Font("Segoe UI", 12),
-                Location = new Point(100, 25),
+                Location = new Point(200, 25),
                 Size = new Size(93, 40),
                 AutoSize = true
             };
@@ -197,7 +241,7 @@ namespace FileMan
                 Name = "searchCueTextBox",
                 Cue = "Search",
                 Font = new Font("Segoe UI", 15),
-                Location = new Point(207, 28),
+                Location = new Point(307, 28),
                 Size = new Size(435, 30),
                 TabIndex = 0
             };
@@ -208,7 +252,7 @@ namespace FileMan
             {
                 Name = "warningLabel",
                 Font = new Font("Segoe UI", 12),
-                Location = new Point(205, 60),
+                Location = new Point(305, 60),
                 AutoSize = true
             };
             warningLabel.Visible = false;
@@ -220,9 +264,9 @@ namespace FileMan
                 Name = "Searchbutton",
                 BackgroundImage = Image.FromFile(@".\assets\img\zoom.png"),
                 BackgroundImageLayout = ImageLayout.Stretch,
-                Location = new Point(610, 30),
+                Location = new Point(710, 30),
                 Size = new Size(28, 30),
-                FlatStyle = FlatStyle.Flat                
+                FlatStyle = FlatStyle.Flat
             };
             Searchbutton.FlatAppearance.BorderColor = Color.White;
             Searchbutton.Click += new EventHandler(Searchbutton_Click);
@@ -234,7 +278,7 @@ namespace FileMan
             {
                 Text = "Changes in the past:",
                 Font = new Font("Segoe UI Semibold", 15, FontStyle.Bold),
-                Location = new Point(100, 85),
+                Location = new Point(200, 85),
                 AutoSize = true
 
             };
@@ -244,11 +288,11 @@ namespace FileMan
             ColoredCombo comboBoxChangesInPast = new ColoredCombo()
             {
                 Name = "comboBoxChangesInPast",
-                Location = new Point(325, 85),
+                Location = new Point(425, 85),
                 Font = new Font("Segoe UI", 15),
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 BackColor = Color.White,
-                FlatStyle = FlatStyle.Flat                
+                FlatStyle = FlatStyle.Flat
             };
             comboBoxChangesInPast.Items.Add("24 Hours");
             comboBoxChangesInPast.Items.Add("72 Hours");
@@ -271,7 +315,7 @@ namespace FileMan
             Label recentChangeStatisticLabel = new Label()
             {
                 Name = "recentChangeStatisticLabel",
-                Location = new Point(100, 150),
+                Location = new Point(200, 150),
                 Font = new Font("Segoe UI Semibold", 15, FontStyle.Bold),
                 AutoSize = true,
                 Text = " "
@@ -289,7 +333,7 @@ namespace FileMan
             Label recentSearchLabel = new Label()
             {
                 Name = "recentSearchLabel",
-                Location = new Point(100, 190),
+                Location = new Point(200, 190),
                 Font = new Font("Segoe UI Semibold", 15, FontStyle.Bold),
                 AutoSize = true,
                 Text = "⬛  Recent search term: "
@@ -301,7 +345,7 @@ namespace FileMan
                 Name = "recentSearchTextBox",
                 ReadOnly = true,
                 BorderStyle = 0,
-                Location = new Point(321, 190),
+                Location = new Point(421, 190),
                 BackColor = Color.White,
                 Font = new Font("Segoe UI Semibold", 15, FontStyle.Bold),
                 TabStop = false
@@ -313,7 +357,7 @@ namespace FileMan
             Label recentFilesLabel = new Label()
             {
                 Name = "recentFilesLabel",
-                Location = new Point(100, 230),
+                Location = new Point(200, 230),
                 Font = new Font("Segoe UI Semibold", 15, FontStyle.Bold),
                 AutoSize = true,
                 Text = "⬛  Recent Files..."
@@ -656,18 +700,18 @@ namespace FileMan
 
         //private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         //{
-            
-            //dataGridView1.ScrollBars = ScrollBars.None;
-            //query the xml input file based on the search conditions
-            //FileQueryConditions fileQueryConditions = new FileQueryConditions()
-            //{
-            //    FileName = (string)e.Argument,
-            //    DateCreatedTimeFrom = DateTime.Now.AddDays(1),
-            //    DateCreatedTimeTo = DateTime.Now
-            //};
-            //var dOTQueriedFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", fileQueryConditions);
-            //fillDataGridView(dOTQueriedFiles);
-       // }
+
+        //dataGridView1.ScrollBars = ScrollBars.None;
+        //query the xml input file based on the search conditions
+        //FileQueryConditions fileQueryConditions = new FileQueryConditions()
+        //{
+        //    FileName = (string)e.Argument,
+        //    DateCreatedTimeFrom = DateTime.Now.AddDays(1),
+        //    DateCreatedTimeTo = DateTime.Now
+        //};
+        //var dOTQueriedFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", fileQueryConditions);
+        //fillDataGridView(dOTQueriedFiles);
+        // }
 
         private void ButtonAdvanced_Click(object sender, EventArgs e)
         {
@@ -1649,7 +1693,8 @@ namespace FileMan
             PictureBox.CheckForIllegalCrossThreadCalls = false;
             pictureBoxLoadingIcon.Visible = true;
             //pictureBoxLoadingIcon.Update();
-            var queriedDataSource = dOTQueriedFiles.Select(i => new {
+            var queriedDataSource = dOTQueriedFiles.Select(i => new
+            {
                 i.Name,
                 i.ParentFolder,
                 i.Location,
