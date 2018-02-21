@@ -51,6 +51,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ColoredCombo.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ConverstorCsvToXml.cs" />
     <Compile Include="CueTextBox.cs">
       <SubType>Component</SubType>

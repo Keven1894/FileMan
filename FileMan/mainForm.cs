@@ -31,7 +31,7 @@ namespace FileMan
             //backgroundWorker.DoWork += BackgroundWorker_DoWork;
             //backgroundWorker.RunWorkerCompleted += BackgroundWorker_RunWorkerCompleted;
             //this.Size = new Size(816, 854);
-            this.Size = new Size(816, 954);
+            this.Size = new Size(1000, 954);
             this.BackColor = Color.White;
             ScrollBar vScrollBar1 = new VScrollBar();
             vScrollBar1.Dock = DockStyle.Right;
@@ -171,7 +171,7 @@ namespace FileMan
             {
                 Name = panelName,
                 Location = new Point(23, 80),
-                Size = new Size(760, 800),
+                Size = new Size(999, 800),
                 BorderStyle = BorderStyle.None
             };
             return panel;
@@ -224,8 +224,10 @@ namespace FileMan
                 BackgroundImage = Image.FromFile(@".\assets\img\zoom.png"),
                 BackgroundImageLayout = ImageLayout.Stretch,
                 Location = new Point(610, 30),
-                Size = new Size(28, 30)
+                Size = new Size(28, 30),
+                FlatStyle = FlatStyle.Flat                
             };
+            Searchbutton.FlatAppearance.BorderColor = Color.White;
             Searchbutton.Click += new EventHandler(Searchbutton_Click);
             panelSearchPage.Controls.Add(Searchbutton);
             Searchbutton.BringToFront();
@@ -242,15 +244,20 @@ namespace FileMan
             panelSearchPage.Controls.Add(labelChangesInPast);
 
             //[PL0217]Add comboBox for past time condition
-            ComboBox comboBoxChangesInPast = new ComboBox()
+            ColoredCombo comboBoxChangesInPast = new ColoredCombo()
             {
                 Name = "comboBoxChangesInPast",
                 Location = new Point(325, 85),
-                Font = new Font("Segoe UI", 15)
+                Font = new Font("Segoe UI", 15),
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                BackColor = Color.White,
+                FlatStyle = FlatStyle.Flat                
             };
             comboBoxChangesInPast.Items.Add("24 Hours");
-            comboBoxChangesInPast.Items.Add("2 Days");
-            comboBoxChangesInPast.Items.Add("3 Days");
+            comboBoxChangesInPast.Items.Add("72 Hours");
+            comboBoxChangesInPast.Items.Add("Week");
+            comboBoxChangesInPast.Items.Add("Month");
+            comboBoxChangesInPast.Items.Add("Year");
             comboBoxChangesInPast.SelectedIndex = 0;
             comboBoxChangesInPast.SelectedIndexChanged += ComboBoxChangesInPast_SelectedIndexChanged;
             panelSearchPage.Controls.Add(comboBoxChangesInPast);
@@ -330,7 +337,7 @@ namespace FileMan
             Panel useAsHorizontalLine = new Panel()
             {
                 Location = new Point(13, 745),
-                Size = new Size(735, 1),
+                Size = new Size(900, 1),
                 BorderStyle = BorderStyle.FixedSingle,
                 Name = "useAsHorizontalLine"
             };
@@ -352,7 +359,7 @@ namespace FileMan
             {
                 Name = "linkLabelFileType2",
                 AutoSize = true,
-                Location = new Point(150, 757),
+                Location = new Point(13 + 200, 757),
                 Font = new Font("Segoe UI", 12),
                 Text = ""
             };
@@ -363,7 +370,7 @@ namespace FileMan
             {
                 Name = "linkLabelFileType3",
                 AutoSize = true,
-                Location = new Point(300, 757),
+                Location = new Point(13 + 370, 757),
                 Font = new Font("Segoe UI", 12),
                 Text = ""
             };
@@ -374,7 +381,7 @@ namespace FileMan
             {
                 Name = "linkLabelFileType4",
                 AutoSize = true,
-                Location = new Point(450, 757),
+                Location = new Point(13 + 540, 757),
                 Font = new Font("Segoe UI", 12),
                 Text = ""
             };
@@ -384,16 +391,24 @@ namespace FileMan
             DataGridView dataGridView1 = new DataGridView()
             {
                 Name = "dataGridView1",
-                Size = new Size(758, 435),
-                Location = new Point(0, 280),
+                Size = new Size(900, 435),
+                Location = new Point(25, 280),
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
                 AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.None,
                 ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize,
                 Font = new Font("Segoe UI", 10),
-                ScrollBars = ScrollBars.Both
+                ScrollBars = ScrollBars.Both,
+                BackgroundColor = Color.White,
+                BorderStyle = BorderStyle.None,
+                RowHeadersVisible = false,
+                CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal,
+                ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None,
+                EnableHeadersVisualStyles = false
             };
             dataGridView1.DataBindingComplete += DataGridView1_DataBindingComplete;
+            dataGridView1.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 12);
             dataGridView1.CellClick += DataGridView1_CellClick;
+            dataGridView1.RowTemplate.Height = 30;
             panelSearchPage.Controls.Add(dataGridView1);
 
 
@@ -696,9 +711,13 @@ namespace FileMan
                 DateCreatedTimeFrom = DateTime.Now.AddDays(1),
                 DateCreatedTimeTo = DateTime.Now
             };
+            PictureBox pictureBoxLoadingIcon = (PictureBox)Controls["panelSearchPage"].Controls["pictureBoxLoadingIcon"];
+            pictureBoxLoadingIcon.Show();
+            pictureBoxLoadingIcon.Update();
             List<DOTFile> dOTJPGFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", fileQueryConditions);
             //fill out the query results table
             fillDataGridView(dOTJPGFiles);
+            pictureBoxLoadingIcon.Hide();
         }
 
         private void LinkLabelFileType2_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -709,9 +728,13 @@ namespace FileMan
                 DateCreatedTimeFrom = DateTime.Now.AddDays(1),
                 DateCreatedTimeTo = DateTime.Now
             };
+            PictureBox pictureBoxLoadingIcon = (PictureBox)Controls["panelSearchPage"].Controls["pictureBoxLoadingIcon"];
+            pictureBoxLoadingIcon.Show();
+            pictureBoxLoadingIcon.Update();
             List<DOTFile> dOTTIFFFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", fileQueryConditions);
             //fill out the query results table
             fillDataGridView(dOTTIFFFiles);
+            pictureBoxLoadingIcon.Hide();
 
         }
 
@@ -723,9 +746,13 @@ namespace FileMan
                 DateCreatedTimeFrom = DateTime.Now.AddDays(1),
                 DateCreatedTimeTo = DateTime.Now
             };
+            PictureBox pictureBoxLoadingIcon = (PictureBox)Controls["panelSearchPage"].Controls["pictureBoxLoadingIcon"];
+            pictureBoxLoadingIcon.Show();
+            pictureBoxLoadingIcon.Update();
             List<DOTFile> dOTPDFFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", fileQueryConditions);
             //fill out the query results table
             fillDataGridView(dOTPDFFiles);
+            pictureBoxLoadingIcon.Hide();
         }
 
         private void ComboBoxChangesInPast_SelectedIndexChanged(object sender, EventArgs e)
@@ -737,10 +764,16 @@ namespace FileMan
                     showPastDaysChanges(DateTime.Now.AddDays(-1));
                     break;
                 case 1:
-                    showPastDaysChanges(DateTime.Now.AddDays(-2));
+                    showPastDaysChanges(DateTime.Now.AddDays(-3));
                     break;
                 case 2:
-                    showPastDaysChanges(DateTime.Now.AddDays(-3));
+                    showPastDaysChanges(DateTime.Now.AddDays(-7));
+                    break;
+                case 3:
+                    showPastDaysChanges(DateTime.Now.AddDays(-30));
+                    break;
+                case 4:
+                    showPastDaysChanges(DateTime.Now.AddDays(-365));
                     break;
                 default:
                     break;
@@ -1591,8 +1624,6 @@ namespace FileMan
                 Ext = (String)i.Name.Split('.').Last()
             }).ToArray();
             DataGridView dataGridView1 = (DataGridView)Controls["panelSearchPage"].Controls["dataGridView1"];
-            //dataGridView1.ScrollBars = ScrollBars.None;
-            //dataGridView1.Rows.Clear();
             dataGridView1.Refresh();
             dataGridView1.DataSource = null;
 
@@ -1610,10 +1641,24 @@ namespace FileMan
 
             //dataGridView1.DataSource = null;
             dataGridView1.DataSource = queriedDataSource;
+            if (queriedDataSource.Length > 0)
+            {
+                dataGridView1.Columns[0].Width = 120;
+                dataGridView1.Columns[1].Width = 120;
+                dataGridView1.Columns[2].Width = 60;
+                dataGridView1.Columns[3].Width = 60;
+                dataGridView1.Columns[4].Width = 60;
+                dataGridView1.Columns[5].Width = 60;
+                dataGridView1.Columns[6].Width = 60;
+                dataGridView1.Columns[7].Width = 40;
+                dataGridView1.Columns[8].Width = 50;
+                dataGridView1.Columns[9].Width = 30;
+
+                dataGridView1.Rows[0].Cells[0].Selected = false;
+            }
             //dataGridView1.Columns[0].Visible = false;
             //dataGridView1.DataBind();
             dataGridView1.Refresh();
-            //dataGridView1.PerformLayout();
             pictureBoxLoadingIcon.Visible = false;
 
         }
