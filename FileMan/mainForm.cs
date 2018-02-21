@@ -20,6 +20,9 @@ namespace FileMan
         DOTFile dOTFileNewSave = new DOTFile();
         //BackgroundWorker backgroundWorker = new BackgroundWorker();
 
+        //[PL0221]Add the flag to check if the menu is showing
+        bool isMenuShowing = false;
+
         public mainForm()
         {
             InitializeComponent();
@@ -40,6 +43,29 @@ namespace FileMan
             //obtain the input file and check if it is the latest one
             Boolean inputFileStatus = CheckTheInputFileStatus();
             showDynamicInfo();
+            this.Click += MainForm_Click;
+        }
+
+        private void MainForm_Click(object sender, EventArgs e)
+        {
+            if (isMenuShowing)
+            {
+                closeMenu();
+            }
+        }
+
+        private void closeMenu()
+        {
+            Button buttonMenuSearch = (Button)Controls["panelMenu"].Controls["buttonMenuSearch"];
+            Button buttonMenuAddFile = (Button)Controls["panelMenu"].Controls["buttonMenuAddFile"];
+            Label labelRedRectangle = (Label)Controls["panelMenu"].Controls["labelRedRectangle"];
+            buttonMenuSearch.Visible = false;
+            buttonMenuAddFile.Visible = false;
+            labelRedRectangle.Visible = false;
+            Panel panelMenu = (Panel)Controls["panelMenu"];
+            panelMenu.Size = new Size(200, 50);
+            panelMenu.BackColor = Color.White;
+            isMenuShowing = false;
         }
 
         private void initComponentsSetup()
@@ -48,7 +74,7 @@ namespace FileMan
             Panel panelMenu = new Panel()
             {
                 Location = new Point(23, 15),
-                Size = new Size(200, 250),
+                Size = new Size(200, 150),
                 BorderStyle = BorderStyle.None,
                 Name = "panelMenu",
                 TabIndex = 0
@@ -68,35 +94,48 @@ namespace FileMan
             buttonMenuIcon.FlatAppearance.BorderSize = 0;
             buttonMenuIcon.FlatAppearance.BorderColor = Color.White;
 
+            Label labelRedRectangle = new Label()
+            {
+                Name = "labelRedRectangle",
+                Text = "▮",
+                Font = new Font("Segoe UI Semilight", 17),
+                AutoSize = true,
+                Location = new Point(0, 58),
+                ForeColor = ColorTranslator.FromHtml("#ce2b2f")
+            };
+            panelMenu.Controls.Add(labelRedRectangle);
+
             Button buttonMenuSearch = new Button()
             {
                 Name = "buttonMenuSearch",
                 Text = "Search",
-                Location = new Point(0, 75),
-                Font = new Font("Segoe UI Semilight", 24),
+                Location = new Point(50, 55),
+                Font = new Font("Segoe UI Semilight", 15),
                 AutoSize = true,
                 FlatStyle = FlatStyle.Flat,
-                BackColor = Color.White
-                
+                BackColor = ColorTranslator.FromHtml("#e5e5e5")
+
             };
             buttonMenuSearch.FlatAppearance.BorderSize = 0;
             buttonMenuSearch.FlatAppearance.BorderColor = Color.White;
-            buttonMenuSearch.FlatAppearance.MouseOverBackColor = Color.White;
+            buttonMenuSearch.FlatAppearance.MouseOverBackColor = ColorTranslator.FromHtml("#e5e5e5");
             buttonMenuSearch.Click += ButtonMenuSearch_Click;
+            buttonMenuSearch.MouseMove += ButtonMenuSearch_MouseMove;
             Button buttonMenuAddFile = new Button()
             {
                 Name = "buttonMenuAddFile",
                 Text = "Add File",
-                Location = new Point(0, 135),
-                Font = new Font("Segoe UI Semilight", 24),
+                Location = new Point(50, 100),
+                Font = new Font("Segoe UI Semilight", 15),
                 AutoSize = true,
                 FlatStyle = FlatStyle.Flat,
-                BackColor = Color.White
+                BackColor = ColorTranslator.FromHtml("#e5e5e5")
             };
             buttonMenuAddFile.Click += ButtonMenuAddFile_Click;
+            buttonMenuAddFile.MouseMove += ButtonMenuAddFile_MouseMove;
             buttonMenuAddFile.FlatAppearance.BorderSize = 0;
             buttonMenuAddFile.FlatAppearance.BorderColor = Color.White;
-            buttonMenuAddFile.FlatAppearance.MouseOverBackColor = Color.White;
+            buttonMenuAddFile.FlatAppearance.MouseOverBackColor = ColorTranslator.FromHtml("#e5e5e5");
 
             panelMenu.Controls.Add(buttonMenuIcon);
             panelMenu.Controls.Add(buttonMenuSearch);
@@ -104,6 +143,7 @@ namespace FileMan
             panelMenu.Visible = true;
             buttonMenuSearch.Visible = false;
             buttonMenuAddFile.Visible = false;
+            labelRedRectangle.Visible = false;
             this.Controls.Add(panelMenu);
 
             initSearchPageComponentsSetup();
@@ -120,12 +160,29 @@ namespace FileMan
             this.Controls.Add(labelFooter);
         }
 
+        private void ButtonMenuSearch_MouseMove(object sender, MouseEventArgs e)
+        {
+            Label labelRedRectangle = (Label)Controls["panelMenu"].Controls["labelRedRectangle"];
+            labelRedRectangle.Location = new Point(0, 58);
+        }
+
+        private void ButtonMenuAddFile_MouseMove(object sender, MouseEventArgs e)
+        {
+            Label labelRedRectangle = (Label)Controls["panelMenu"].Controls["labelRedRectangle"];
+            labelRedRectangle.Location = new Point(0, 102);
+        }
+
         private void ButtonMenuAddFile_Click(object sender, EventArgs e)
         {
             Panel panelSearchPage = (Panel)Controls["panelSearchPage"];
             Panel panelAddFilePage = (Panel)Controls["panelAddFilePage"];
             panelSearchPage.Visible = false;
             panelAddFilePage.Visible = true;
+
+            closeMenu();
+
+            Button buttonMenuIcon = (Button)Controls["panelMenu"].Controls["buttonMenuIcon"];
+            buttonMenuIcon.Text = "☰  Add File";
         }
 
         private void ButtonMenuSearch_Click(object sender, EventArgs e)
@@ -134,15 +191,38 @@ namespace FileMan
             Panel panelAddFilePage = (Panel)Controls["panelAddFilePage"];
             panelAddFilePage.Visible = false;
             panelSearchPage.Visible = true;
+
+            closeMenu();
+
+            Button buttonMenuIcon = (Button)Controls["panelMenu"].Controls["buttonMenuIcon"];
+            buttonMenuIcon.Text = "☰  Search";
+
         }
 
         private void ButtonMenuIcon_Click(object sender, EventArgs e)
         {
             Button buttonMenuSearch = (Button)Controls["panelMenu"].Controls["buttonMenuSearch"];
             Button buttonMenuAddFile = (Button)Controls["panelMenu"].Controls["buttonMenuAddFile"];
-
-            buttonMenuSearch.Visible = true;
-            buttonMenuAddFile.Visible = true;
+            Label labelRedRectangle = (Label)Controls["panelMenu"].Controls["labelRedRectangle"];
+            Panel panelMenu = (Panel)Controls["panelMenu"];
+            if (!isMenuShowing)
+            {
+                buttonMenuSearch.Visible = true;
+                buttonMenuAddFile.Visible = true;
+                labelRedRectangle.Visible = true;
+                panelMenu.Size = new Size(200, 150);
+                panelMenu.BackColor = ColorTranslator.FromHtml("#e5e5e5");
+                isMenuShowing = true;
+            }
+            else
+            {
+                buttonMenuSearch.Visible = false;
+                buttonMenuAddFile.Visible = false;
+                labelRedRectangle.Visible = false;
+                panelMenu.Size = new Size(200, 50);
+                panelMenu.BackColor = Color.White;
+                isMenuShowing = false;
+            }
         }
 
         private void showPastDaysChanges(DateTime fromDateTime)
@@ -223,10 +303,12 @@ namespace FileMan
             //[PL0217]Create a big panel for all "Search page" components.
             Panel panelSearchPage = createPagePanel("panelSearchPage");
 
+            panelSearchPage.Click += PanelSearchPage_Click;
+
             //[PL0217]Add button for advanced search.
             Button buttonAdvanced = new Button()
             {
-                Text = "Advanced",
+                Text = "Advanced ▾",
                 Font = new Font("Segoe UI", 12),
                 Location = new Point(200, 25),
                 Size = new Size(93, 40),
@@ -478,7 +560,7 @@ namespace FileMan
             //[PL0217]Add panel for advanced search
             Panel panelAdvancedSearch = new Panel()
             {
-                Location = new Point(100, 76),
+                Location = new Point(200, 76),
                 Size = new Size(545, 400),
                 BorderStyle = BorderStyle.FixedSingle,
                 Name = "panelAdvancedSearch",
@@ -653,6 +735,11 @@ namespace FileMan
             panelSearchPage.Controls.Add(panelAdvancedSearch);
             panelAdvancedSearch.BringToFront();
             this.Controls.Add(panelSearchPage);
+        }
+
+        private void PanelSearchPage_Click(object sender, EventArgs e)
+        {
+            closeMenu();
         }
 
         private void RecentSearchTextBox_TextChanged(object sender, EventArgs e)
@@ -890,6 +977,7 @@ namespace FileMan
         {
             //[PL0217]Create a big panel for all "Add File" components.
             Panel panelAddFilePage = createPagePanel("panelAddFilePage");
+            panelAddFilePage.Click += PanelAddFilePage_Click;
 
             int startingXPoint = 50;
             int startingYPoint = 0;
@@ -1072,6 +1160,11 @@ namespace FileMan
             };
             buttonSave.Click += ButtonSave_Click;
             panelAddFilePage.Controls.Add(buttonSave);
+        }
+
+        private void PanelAddFilePage_Click(object sender, EventArgs e)
+        {
+            closeMenu();
         }
 
         private void TextBoxEndingMilepost_KeyPress(object sender, KeyPressEventArgs e)
@@ -1510,9 +1603,7 @@ namespace FileMan
         {
             Button Searchbutton = (Button)Controls["panelSearchPage"].Controls["Searchbutton"];
             Searchbutton.Enabled = false;
-            PictureBox pictureBoxLoadingIcon = (PictureBox)Controls["panelSearchPage"].Controls["pictureBoxLoadingIcon"];
-            pictureBoxLoadingIcon.Show();
-            pictureBoxLoadingIcon.Update();
+
             //[PL0218]Hide advanced search if it is visible.
             Panel panelAdvancedSearch = (Panel)Controls["panelSearchPage"].Controls["panelAdvancedSearch"];
             panelAdvancedSearch.Visible = false;
@@ -1525,6 +1616,9 @@ namespace FileMan
             //check the search key word
             if (searchCueTextBox.Text != "")
             {
+                PictureBox pictureBoxLoadingIcon = (PictureBox)Controls["panelSearchPage"].Controls["pictureBoxLoadingIcon"];
+                pictureBoxLoadingIcon.Show();
+                pictureBoxLoadingIcon.Update();
                 warningLabel.Text = "";
                 //fill out the query results table
                 //fillDataGridView(dOTQueriedFiles);
