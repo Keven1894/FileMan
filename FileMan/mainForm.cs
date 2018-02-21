@@ -7,9 +7,6 @@ using System.Windows.Forms;
 using System.IO;
 using System.Xml.Linq;
 using iTextSharp.text.pdf;
-using System.Threading.Tasks;
-using System.Threading;
-using System.ComponentModel;
 using System.Diagnostics;
 
 namespace FileMan
@@ -780,7 +777,7 @@ namespace FileMan
             }
         }
 
-        private void createSingleSetAdditionalItem(String title, String textBoxName, String warning, Point location, bool isMandatory)
+        private void createSingleSetAdditionalItem(String title, String textBoxName, String warning, Point location, bool isMandatory, String textBoxType)
         {
             Label labelTitle = new Label()
             {
@@ -804,26 +801,45 @@ namespace FileMan
                 };
                 Controls["panelAddFilePage"].Controls.Add(labelRedStar);
             }
-
-            TextBox textBoxContent = new TextBox()
-            {
-                Name = textBoxName,
-                Location = new Point(location.X, location.Y + 35),
-                Font = new Font("Segoe UI", 15),
-                Size = new Size(315, 20),
-                AutoSize = true,
-                Text = ""
-            };
-            Controls["panelAddFilePage"].Controls.Add(textBoxContent);
             Label labelWarning = new Label()
             {
                 Name = warning,
-                Font = new Font("Seravek", 8, FontStyle.Italic),
-                Location = new Point(location.X - 2, textBoxContent.Location.Y + 45),
+                Font = new Font("Seravek", 9, FontStyle.Italic),
                 AutoSize = true,
                 Text = warning
             };
+
             Controls["panelAddFilePage"].Controls.Add(labelWarning);
+            if (textBoxType == "TextBox")
+            {
+                TextBox textBoxContent = new TextBox()
+                {
+                    Name = textBoxName,
+                    Location = new Point(location.X, location.Y + 35),
+                    Font = new Font("Segoe UI", 15),
+                    Size = new Size(380, 20),
+                    AutoSize = true,
+                    Text = ""
+                };
+                Controls["panelAddFilePage"].Controls.Add(textBoxContent);
+                labelWarning.Location = new Point(location.X - 2, textBoxContent.Location.Y + 45);
+            }
+            if (textBoxType == "ComboBox")
+            {
+                ColoredCombo textBoxContent = new ColoredCombo()
+                {
+                    Name = textBoxName,
+                    Location = new Point(location.X, location.Y + 35),
+                    Font = new Font("Segoe UI", 15),
+                    Size = new Size(380, 20),
+                    DropDownStyle = ComboBoxStyle.DropDownList,
+                    BackColor = Color.White,
+                    FlatStyle = FlatStyle.Flat
+                };
+                Controls["panelAddFilePage"].Controls.Add(textBoxContent);
+                labelWarning.Location = new Point(location.X - 2, textBoxContent.Location.Y + 45);
+            }
+
         }
 
         private void initAddFilePageComponentsSetup()
@@ -831,8 +847,9 @@ namespace FileMan
             //[PL0217]Create a big panel for all "Add File" components.
             Panel panelAddFilePage = createPagePanel("panelAddFilePage");
 
-            int startingXPoint = 25;
+            int startingXPoint = 50;
             int startingYPoint = 0;
+            int textBoxRightMove = 450;
             //[PL0217]Add button for advanced search.
             Button buttonSelectFile = new Button()
             {
@@ -840,7 +857,8 @@ namespace FileMan
                 Font = new Font("Segoe UI", 15),
                 Location = new Point(startingXPoint, startingYPoint),
                 Size = new Size(120, 40),
-                AutoSize = false
+                AutoSize = false,
+                BackColor = Color.FromArgb(0xcccccc)
             };
             buttonSelectFile.Click += ButtonSelectFile_Click;
             panelAddFilePage.Controls.Add(buttonSelectFile);
@@ -870,40 +888,59 @@ namespace FileMan
             panelAddFilePage.Controls.Add(labelInOrderTo);
 
             this.Controls.Add(panelAddFilePage);
-            createSingleSetAdditionalItem("Section Number", "textBoxSectionNumber", "Please make sure to enter the eight digits section number.", Location = new Point(startingXPoint, startingYPoint + 60 + 30), true);
+            createSingleSetAdditionalItem("Section Number", "textBoxSectionNumber", "Please make sure to enter the eight digits section number.", Location = new Point(startingXPoint, startingYPoint + 60 + 30), true, "TextBox");
             TextBox textBoxSectionNumber = (TextBox)Controls["panelAddFilePage"].Controls["textBoxSectionNumber"];
             textBoxSectionNumber.MaxLength = 8;
             textBoxSectionNumber.TextChanged += TextBoxSectionNumber_TextChanged;
             textBoxSectionNumber.KeyPress += TextBoxSectionNumber_KeyPress;
-            createSingleSetAdditionalItem("State Road (SR)", "textBoxSR", "Type only the number.", Location = new Point(startingXPoint + 375, startingYPoint + 60 + 30), true);
+            createSingleSetAdditionalItem("State Road (SR)", "textBoxSR", "Type only the number.", Location = new Point(startingXPoint + textBoxRightMove, startingYPoint + 60 + 30), true, "TextBox");
             TextBox textBoxSR = (TextBox)Controls["panelAddFilePage"].Controls["textBoxSR"];
             textBoxSR.TextChanged += TextBoxSR_TextChanged;
             textBoxSR.KeyPress += TextBoxSR_KeyPress;
 
-            createSingleSetAdditionalItem("Study Type", "comboBoxStudyType", "Select one study type.", Location = new Point(startingXPoint, startingYPoint + 200), true);
-            createSingleSetAdditionalItem("Location", "comboBoxLocation", "Select one location type.", Location = new Point(startingXPoint + 375, startingYPoint + 200), true);
+            createSingleSetAdditionalItem("Study Type", "comboBoxStudyType", "Select one study type.", Location = new Point(startingXPoint, startingYPoint + 200), true, "ComboBox");
+            ColoredCombo comboBoxStudyType = (ColoredCombo)Controls["panelAddFilePage"].Controls["comboBoxStudyType"];
+            comboBoxStudyType.Items.Add("Select");
+            comboBoxStudyType.Items.Add("Qualitative Assessments");
+            comboBoxStudyType.Items.Add("Signal Warrant Analysis");
+            comboBoxStudyType.Items.Add("Intersection Analysis");
+            comboBoxStudyType.Items.Add("Arterial Analysis");
+            comboBoxStudyType.Items.Add("Left Turn Please Warrant Analysis");
+            comboBoxStudyType.Items.Add("Composite Studies");
+            comboBoxStudyType.Items.Add("Other traffic engineering related studies");
+            comboBoxStudyType.Items.Add("Public Involvement");
+            comboBoxStudyType.Items.Add("Fatal Crash Reviews");
+            comboBoxStudyType.Items.Add("Speed Zone Studies");
+            comboBoxStudyType.Items.Add("Technical Memo");
+            comboBoxStudyType.SelectedIndex = 0;
 
+            createSingleSetAdditionalItem("Location", "comboBoxLocation", "Select one location type.", Location = new Point(startingXPoint + textBoxRightMove, startingYPoint + 200), true, "ComboBox");
+            ColoredCombo comboBoxLocation = (ColoredCombo)Controls["panelAddFilePage"].Controls["comboBoxLocation"];
+            comboBoxLocation.Items.Add("Select");
+            comboBoxLocation.Items.Add("Intersection");
+            comboBoxLocation.Items.Add("Segment");
+            comboBoxLocation.SelectedIndex = 0;
 
-            createSingleSetAdditionalItem("Beginning Milepost", "textBoxBeginningMilepost", "Enter only Milepost digits and double the numbers to avoid errors" + Environment.NewLine + "into the system.", Location = new Point(startingXPoint, startingYPoint + 310), true);
+            createSingleSetAdditionalItem("Beginning Milepost", "textBoxBeginningMilepost", "Enter only Milepost digits and double the numbers to avoid errors" + Environment.NewLine + "into the system.", Location = new Point(startingXPoint, startingYPoint + 310), true, "TextBox");
             TextBox textBoxBeginningMilepost = (TextBox)Controls["panelAddFilePage"].Controls["textBoxBeginningMilepost"];
-            textBoxBeginningMilepost.Size = new Size(120, 20);
+            textBoxBeginningMilepost.Size = new Size(170, 20);
             textBoxBeginningMilepost.MaxLength = 6;
             textBoxBeginningMilepost.TextChanged += TextBoxBeginningMilepost_TextChanged;
             textBoxBeginningMilepost.KeyPress += TextBoxBeginningMilepost_KeyPress;
 
-            createSingleSetAdditionalItem("Ending Milepost", "textBoxEndingMilepost", "", Location = new Point(startingXPoint + 195, startingYPoint + 310), true);
+            createSingleSetAdditionalItem("Ending Milepost", "textBoxEndingMilepost", "", Location = new Point(startingXPoint + 210, startingYPoint + 310), true, "TextBox");
             TextBox textBoxEndingMilepost = (TextBox)Controls["panelAddFilePage"].Controls["textBoxEndingMilepost"];
-            textBoxEndingMilepost.Size = new Size(120, 20);
+            textBoxEndingMilepost.Size = new Size(170, 20);
             textBoxEndingMilepost.MaxLength = 6;
             textBoxEndingMilepost.TextChanged += TextBoxEndingMilepost_TextChanged;
             textBoxEndingMilepost.KeyPress += TextBoxEndingMilepost_KeyPress;
 
-            createSingleSetAdditionalItem("FM Number", "textBoxFMNumber", "Enter the number, including \"-\".", Location = new Point(startingXPoint + 375, startingYPoint + 310), true);
+            createSingleSetAdditionalItem("FM Number", "textBoxFMNumber", "Enter the number, including \"-\".", Location = new Point(startingXPoint + textBoxRightMove, startingYPoint + 310), true, "TextBox");
             TextBox textBoxFMNumber = (TextBox)Controls["panelAddFilePage"].Controls["textBoxFMNumber"];
             textBoxFMNumber.KeyPress += TextBoxFMNumber_KeyPress;
 
-            createSingleSetAdditionalItem("Author", "textBoxAuthor", "Add the author of the report. For instance, consultant company name.", Location = new Point(startingXPoint, startingYPoint + 430), true);
-            createSingleSetAdditionalItem("Key words", "textBoxKeyWords", "Add key words improve results in document searches.", Location = new Point(startingXPoint + 375, startingYPoint + 430), false);
+            createSingleSetAdditionalItem("Author", "textBoxAuthor", "Add the author of the report. For instance, consultant company name.", Location = new Point(startingXPoint, startingYPoint + 430), true, "TextBox");
+            createSingleSetAdditionalItem("Key words", "textBoxKeyWords", "Add key words improve results in document searches.", Location = new Point(startingXPoint + textBoxRightMove, startingYPoint + 430), false, "TextBox");
 
 
 
@@ -913,8 +950,8 @@ namespace FileMan
                 Font = new Font("Segoe UI Semibold", 15, FontStyle.Bold),
                 Location = new Point(startingXPoint, startingYPoint + 540),
                 AutoSize = false,
-                BackColor = Color.Pink,
-                Size = new Size(690, 30),
+                BackColor = ColorTranslator.FromHtml("#f0bfc0"),
+                Size = new Size(830, 30),
                 Text = "File Name: " + newFileName
             };
             panelAddFilePage.Controls.Add(labelFileName);
@@ -923,7 +960,7 @@ namespace FileMan
             {
                 Name = "linkLabelFileNameStructure",
                 Font = new Font("Seravek", 8, FontStyle.Italic),
-                Location = new Point(startingXPoint + 560, startingYPoint + 575),
+                Location = new Point(startingXPoint + 701, startingYPoint + 575),
                 AutoSize = true,
                 Text = "About File Name Structure."
             };
@@ -945,16 +982,16 @@ namespace FileMan
                 Font = new Font("Segoe UI", 11),
                 Location = new Point(startingXPoint, startingYPoint + 620),
                 AutoSize = false,
-                BackColor = Color.Gray,
-                Size = new Size(315, 130),
+                BackColor = ColorTranslator.FromHtml("#f2f2f2"),
+                Size = new Size(380, 130),
                 Text = "File Info Details..."
             };
             panelAddFilePage.Controls.Add(labelFileInfoContent);
 
-            createSingleSetAdditionalItem("Comments", "textBoxComments", "Add important comments related to the study.", Location = new Point(startingXPoint + 375, startingYPoint + 585), false);
+            createSingleSetAdditionalItem("Comments", "textBoxComments", "Add important comments related to the study.", Location = new Point(startingXPoint + textBoxRightMove, startingYPoint + 585), false, "TextBox");
             TextBox textBoxComments = (TextBox)Controls["panelAddFilePage"].Controls["textBoxComments"];
             textBoxComments.Multiline = true;
-            textBoxComments.Size = new Size(315, 80);
+            textBoxComments.Size = new Size(380, 80);
             Label labelComments = (Label)Controls["panelAddFilePage"].Controls["Add important comments related to the study."];
             labelComments.Location = new Point(textBoxComments.Location.X - 2, textBoxComments.Location.Y + 95);
 
@@ -983,10 +1020,11 @@ namespace FileMan
             {
                 Name = "buttonSave",
                 Font = new Font("Segoe UI", 15),
-                Location = new Point(startingXPoint + 570, startingYPoint + 740),
+                Location = new Point(startingXPoint + 712, startingYPoint + 740),
                 Size = new Size(120, 40),
                 AutoSize = false,
-                Text = "Save"
+                Text = "Save",
+                BackColor = Color.FromArgb(0xcccccc)
             };
             buttonSave.Click += ButtonSave_Click;
             panelAddFilePage.Controls.Add(buttonSave);
