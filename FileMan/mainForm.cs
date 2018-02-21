@@ -21,17 +21,18 @@ namespace FileMan
         string newFileName = "SectionNo_SRxx_StudyType_Location_MPxx_xx.suffix";
         //[PL0219]New file to save
         DOTFile dOTFileNewSave = new DOTFile();
-        BackgroundWorker backgroundWorker = new BackgroundWorker();
+        //BackgroundWorker backgroundWorker = new BackgroundWorker();
 
         public mainForm()
         {
             InitializeComponent();
             initComponentsSetup();
 
-            backgroundWorker.DoWork += BackgroundWorker_DoWork;
-            backgroundWorker.RunWorkerCompleted += BackgroundWorker_RunWorkerCompleted;
+            //backgroundWorker.DoWork += BackgroundWorker_DoWork;
+            //backgroundWorker.RunWorkerCompleted += BackgroundWorker_RunWorkerCompleted;
             //this.Size = new Size(816, 854);
             this.Size = new Size(816, 954);
+            this.BackColor = Color.White;
             ScrollBar vScrollBar1 = new VScrollBar();
             vScrollBar1.Dock = DockStyle.Right;
             //vScrollBar1.Scroll += (sender, e) => { flowLayoutPanel.VerticalScroll.Value = vScrollBar1.Value; };
@@ -114,7 +115,7 @@ namespace FileMan
             };
             List<DOTFile> dOTQueriedFilesRecentOneDay = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", fileQueryConditions);
             var distinctFolderCountOneDay = dOTQueriedFilesRecentOneDay.Select(x => x.ParentFolder).Distinct().Count();
-            String recentChangeStatistic = dOTQueriedFilesRecentOneDay.Count.ToString() + " Files, " + distinctFolderCountOneDay.ToString() + " Folders changed.";
+            String recentChangeStatistic = "⬛  " + dOTQueriedFilesRecentOneDay.Count.ToString() + " Files, " + distinctFolderCountOneDay.ToString() + " Folders changed.";
             Label recentChangeStatisticLabel = (Label)Controls["panelSearchPage"].Controls["recentChangeStatisticLabel"];
             recentChangeStatisticLabel.Text = recentChangeStatistic;
             //fill out the query results table
@@ -287,7 +288,7 @@ namespace FileMan
                 Location = new Point(100, 190),
                 Font = new Font("Segoe UI Semibold", 15, FontStyle.Bold),
                 AutoSize = true,
-                Text = "Recent search term: "
+                Text = "⬛  Recent search term: "
             };
             panelSearchPage.Controls.Add(recentSearchLabel);
 
@@ -296,9 +297,9 @@ namespace FileMan
                 Name = "recentSearchTextBox",
                 ReadOnly = true,
                 BorderStyle = 0,
-                Location = new Point(290, 192),
+                Location = new Point(321, 190),
+                BackColor = Color.White,
                 Font = new Font("Segoe UI Semibold", 15, FontStyle.Bold),
-                BackColor = this.BackColor,
                 TabStop = false
             };
             recentSearchTextBox.TextChanged += RecentSearchTextBox_TextChanged;
@@ -311,7 +312,7 @@ namespace FileMan
                 Location = new Point(100, 230),
                 Font = new Font("Segoe UI Semibold", 15, FontStyle.Bold),
                 AutoSize = true,
-                Text = "Recent Files..."
+                Text = "⬛  Recent Files..."
             };
             panelSearchPage.Controls.Add(recentFilesLabel);
 
@@ -386,9 +387,10 @@ namespace FileMan
                 Size = new Size(758, 435),
                 Location = new Point(0, 280),
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
-                AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells,
+                AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.None,
                 ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize,
-                Font = new Font("Segoe UI", 10)
+                Font = new Font("Segoe UI", 10),
+                ScrollBars = ScrollBars.Both
             };
             dataGridView1.DataBindingComplete += DataGridView1_DataBindingComplete;
             dataGridView1.CellClick += DataGridView1_CellClick;
@@ -612,7 +614,7 @@ namespace FileMan
             if (e.ColumnIndex == 0)
             {
                 try
-                {//Process.Start(@"c:\");
+                {
                     Process.Start(dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex + 1].FormattedValue.ToString());
                 }
                 catch
@@ -632,26 +634,28 @@ namespace FileMan
             //}
         }
 
-        private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            Button Searchbutton = (Button)Controls["panelSearchPage"].Controls["Searchbutton"];
-            Searchbutton.Enabled = true;
-            PictureBox pictureBoxLoadingIcon = (PictureBox)Controls["panelSearchPage"].Controls["pictureBoxLoadingIcon"];
-            pictureBoxLoadingIcon.Hide();
-        }
+        //private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        //{
+        //    Button Searchbutton = (Button)Controls["panelSearchPage"].Controls["Searchbutton"];
+        //    Searchbutton.Enabled = true;
+        //    PictureBox pictureBoxLoadingIcon = (PictureBox)Controls["panelSearchPage"].Controls["pictureBoxLoadingIcon"];
+        //    pictureBoxLoadingIcon.Hide();
+        //}
 
-        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
-        {
+        //private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        //{
+            
+            //dataGridView1.ScrollBars = ScrollBars.None;
             //query the xml input file based on the search conditions
-            FileQueryConditions fileQueryConditions = new FileQueryConditions()
-            {
-                FileName = (string)e.Argument,
-                DateCreatedTimeFrom = DateTime.Now.AddDays(1),
-                DateCreatedTimeTo = DateTime.Now
-            };
-            var dOTQueriedFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", fileQueryConditions);
-            fillDataGridView(dOTQueriedFiles);
-        }
+            //FileQueryConditions fileQueryConditions = new FileQueryConditions()
+            //{
+            //    FileName = (string)e.Argument,
+            //    DateCreatedTimeFrom = DateTime.Now.AddDays(1),
+            //    DateCreatedTimeTo = DateTime.Now
+            //};
+            //var dOTQueriedFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", fileQueryConditions);
+            //fillDataGridView(dOTQueriedFiles);
+       // }
 
         private void ButtonAdvanced_Click(object sender, EventArgs e)
         {
@@ -1442,8 +1446,20 @@ namespace FileMan
                     recentSearchTextBox.Text = recentSearchTextBox.Text + "\"" + keywordFirst + "\".";
                 }
                 numberOfSearchTerm++;
+                DataGridView dataGridView1 = (DataGridView)Controls["panelSearchPage"].Controls["dataGridView1"];
+                dataGridView1.DataSource = null;
+                //backgroundWorker.RunWorkerAsync(searchCueTextBox.Text);
+                FileQueryConditions fileQueryConditions = new FileQueryConditions()
+                {
+                    FileName = searchCueTextBox.Text,
+                    DateCreatedTimeFrom = DateTime.Now.AddDays(1),
+                    DateCreatedTimeTo = DateTime.Now
+                };
+                var dOTQueriedFiles = queryInfoFromXMLInputFile("./inputFile/outputxml.xml", fileQueryConditions);
+                fillDataGridView(dOTQueriedFiles);
+                dataGridView1.Refresh();
+                Searchbutton.Enabled = true;
 
-                backgroundWorker.RunWorkerAsync(searchCueTextBox.Text);
             }
             else
             {
@@ -1575,6 +1591,7 @@ namespace FileMan
                 Ext = (String)i.Name.Split('.').Last()
             }).ToArray();
             DataGridView dataGridView1 = (DataGridView)Controls["panelSearchPage"].Controls["dataGridView1"];
+            //dataGridView1.ScrollBars = ScrollBars.None;
             //dataGridView1.Rows.Clear();
             dataGridView1.Refresh();
             dataGridView1.DataSource = null;
@@ -1587,17 +1604,18 @@ namespace FileMan
                 TrackVisitedState = true,
                 ActiveLinkColor = Color.White,
                 VisitedLinkColor = Color.YellowGreen
-                //,
-                //Frozen = false,
-                //AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             };
 
             dataGridView1.Columns.Add(col);
 
+            //dataGridView1.DataSource = null;
             dataGridView1.DataSource = queriedDataSource;
             //dataGridView1.Columns[0].Visible = false;
             //dataGridView1.DataBind();
+            dataGridView1.Refresh();
+            //dataGridView1.PerformLayout();
             pictureBoxLoadingIcon.Visible = false;
+
         }
         //below function is used to change the tableLayoutPanel border color.
         private void searchResultTableLayoutPanel_CellPaint(object sender, TableLayoutCellPaintEventArgs e)
