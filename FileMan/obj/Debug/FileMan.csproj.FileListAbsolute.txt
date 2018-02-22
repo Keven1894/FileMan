@@ -10,3 +10,13 @@ C:\Users\28153\Documents\17_American_Study\02_After_Arrive_US\P14_File_Scan\winF
 C:\Users\28153\Documents\17_American_Study\02_After_Arrive_US\P14_File_Scan\winForm\FileMan\FileMan\obj\Debug\FileMan.pdb
 C:\Users\28153\Documents\17_American_Study\02_After_Arrive_US\P14_File_Scan\winForm\FileMan\FileMan\bin\Debug\itextsharp.dll
 C:\Users\28153\Documents\17_American_Study\02_After_Arrive_US\P14_File_Scan\winForm\FileMan\FileMan\bin\Debug\itextsharp.xml
+D:\Projects\fdot_jorge\FileMan\FileMan\FileMan\bin\Debug\FileMan.exe.config
+D:\Projects\fdot_jorge\FileMan\FileMan\FileMan\obj\Debug\FileMan.pdb
+D:\Projects\fdot_jorge\FileMan\FileMan\FileMan\bin\Debug\FileMan.exe
+D:\Projects\fdot_jorge\FileMan\FileMan\FileMan\bin\Debug\FileMan.pdb
+D:\Projects\fdot_jorge\FileMan\FileMan\FileMan\bin\Debug\itextsharp.xml
+D:\Projects\fdot_jorge\FileMan\FileMan\FileMan\obj\Debug\FileMan.csprojResolveAssemblyReference.cache
+D:\Projects\fdot_jorge\FileMan\FileMan\FileMan\obj\Debug\FileMan.mainForm.resources
+D:\Projects\fdot_jorge\FileMan\FileMan\FileMan\obj\Debug\FileMan.Properties.Resources.resources
+D:\Projects\fdot_jorge\FileMan\FileMan\FileMan\obj\Debug\FileMan.csproj.GenerateResource.Cache
+D:\Projects\fdot_jorge\FileMan\FileMan\FileMan\obj\Debug\FileMan.exe

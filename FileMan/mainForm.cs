@@ -93,8 +93,7 @@ namespace FileMan
             {
                 Name = "buttonMenuIcon",
                 Location = new Point(10, 14),
-                Font = new Font("Segoe UI Semilight", 24),
-                Size = new Size(25, 25),
+                Size = new Size(16, 16),
                 BackgroundImage = Image.FromFile(@".\assets\img\menu.png"),
                 BackgroundImageLayout = ImageLayout.Stretch,
                 //Text = "☰",
@@ -107,8 +106,8 @@ namespace FileMan
             Label labelPageTitle = new Label()
             {
                 Name = "labelPageTitle",
-                Location = new Point(60, 2),
-                Font = new Font("Segoe UI Semilight", 24),
+                Location = new Point(60, 5),
+                Font = new Font("Segoe UI Semilight", 18),
                 AutoSize = true,
                 Text = "Search"
             };
