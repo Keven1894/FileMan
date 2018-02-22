@@ -23,6 +23,8 @@ namespace FileMan
         //[PL0221]Add the flag to check if the menu is showing
         bool isMenuShowing = false;
 
+        //[PL0221]For auto complete in search textbox
+        AutoCompleteStringCollection autoComplete = new AutoCompleteStringCollection();
         public mainForm()
         {
             InitializeComponent();
@@ -1045,6 +1047,7 @@ namespace FileMan
             comboBoxStudyType.Items.Add("Speed Zone Studies");
             comboBoxStudyType.Items.Add("Technical Memo");
             comboBoxStudyType.SelectedIndex = 0;
+            comboBoxStudyType.SelectedIndexChanged += ComboBoxStudyType_SelectedIndexChanged;
 
             createSingleSetAdditionalItem("Location", "comboBoxLocation", "Select one location type.", Location = new Point(startingXPoint + textBoxRightMove, startingYPoint + 200), true, "ComboBox");
             ColoredCombo comboBoxLocation = (ColoredCombo)Controls["panelAddFilePage"].Controls["comboBoxLocation"];
@@ -1052,6 +1055,7 @@ namespace FileMan
             comboBoxLocation.Items.Add("Intersection");
             comboBoxLocation.Items.Add("Segment");
             comboBoxLocation.SelectedIndex = 0;
+            comboBoxLocation.SelectedIndexChanged += ComboBoxLocation_SelectedIndexChanged;
 
             createSingleSetAdditionalItem("Beginning Milepost", "textBoxBeginningMilepost", "Enter only Milepost digits and double the numbers to avoid errors" + Environment.NewLine + "into the system.", Location = new Point(startingXPoint, startingYPoint + 310), true, "TextBox");
             TextBox textBoxBeginningMilepost = (TextBox)Controls["panelAddFilePage"].Controls["textBoxBeginningMilepost"];
@@ -1162,6 +1166,95 @@ namespace FileMan
             panelAddFilePage.Controls.Add(buttonSave);
         }
 
+        private void ComboBoxLocation_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Label labelFileName = (Label)Controls["panelAddFilePage"].Controls["labelFileName"];
+            ColoredCombo ComboBoxLocation = (ColoredCombo)Controls["panelAddFilePage"].Controls["ComboBoxLocation"];
+            String location = "";
+            switch (ComboBoxLocation.SelectedIndex)
+            {
+                case 0:
+                    location = "";
+                    break;
+                case 1:
+                    location = "Intersection";
+                    break;
+                case 2:
+                    location = "Segment";
+                    break;
+                default:
+                    break;
+            }
+
+            newFileName = newFileName.Split('_')[0]
+                + "_" + newFileName.Split('_')[1]
+                + "_" + newFileName.Split('_')[2]
+                + "_" + location
+                + "_" + newFileName.Split('_')[4]
+                + "_" + newFileName.Split('_')[5];
+
+            labelFileName.Text = labelFileName.Text.Split(':')[0] + ":" + newFileName.Replace(" ", "_");
+
+        }
+
+        private void ComboBoxStudyType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Label labelFileName = (Label)Controls["panelAddFilePage"].Controls["labelFileName"];
+            ColoredCombo ComboBoxStudyType = (ColoredCombo)Controls["panelAddFilePage"].Controls["ComboBoxStudyType"];
+            String studyType = "";
+            switch (ComboBoxStudyType.SelectedIndex)
+            {
+                case 0:
+                    studyType = "";
+                    break;
+                case 1:
+                    studyType = "Qualitative Assessments";
+                    break;
+                case 2:
+                    studyType = "Signal Warrant Analysis";
+                    break;
+                case 3:
+                    studyType = "Intersection Analysis";
+                    break;
+                case 4:
+                    studyType = "Arterial Analysis";
+                    break;
+                case 5:
+                    studyType = "Left Turn Please Warrant Analysis";
+                    break;
+                case 6:
+                    studyType = "Composite Studies";
+                    break;
+                case 7:
+                    studyType = "Other traffic engineering related_studies";
+                    break;
+                case 8:
+                    studyType = "Public Involvement";
+                    break;
+                case 9:
+                    studyType = "Fatal Crash Reviews";
+                    break;
+                case 10:
+                    studyType = "Speed Zone Studies";
+                    break;
+                case 11:
+                    studyType = "Technical Memo";
+                    break;
+                default:
+                    break;
+            }
+
+            newFileName = newFileName.Split('_')[0]
+                + "_" + newFileName.Split('_')[1]
+                + "_" + studyType
+                + "_" + newFileName.Split('_')[3]
+                + "_" + newFileName.Split('_')[4]
+                + "_" + newFileName.Split('_')[5];
+
+            labelFileName.Text = labelFileName.Text.Split(':')[0] + ":" + newFileName.Replace(" ", "_");
+
+        }
+
         private void PanelAddFilePage_Click(object sender, EventArgs e)
         {
             closeMenu();
@@ -1194,13 +1287,15 @@ namespace FileMan
             Label labelFileName = (Label)Controls["panelAddFilePage"].Controls["labelFileName"];
             string textBoxEndingMilepostText = textBoxEndingMilepost.Text;
 
-            labelFileName.Text = labelFileName.Text.Split(':')[0] + ":"
-                + labelFileName.Text.Split(':')[1].Split('_')[0]
-                + "_" + labelFileName.Text.Split(':')[1].Split('_')[1]
-                + "_" + labelFileName.Text.Split(':')[1].Split('_')[2]
-                + "_" + labelFileName.Text.Split(':')[1].Split('_')[3]
-                + "_" + labelFileName.Text.Split(':')[1].Split('_')[4]
-                + "_" + textBoxEndingMilepostText.Replace(".", "");
+            newFileName = newFileName.Split('.')[0].Split('_')[0]
+                        + "_" + newFileName.Split('.')[0].Split('_')[1]
+                        + "_" + newFileName.Split('.')[0].Split('_')[2]
+                        + "_" + newFileName.Split('.')[0].Split('_')[3]
+                        + "_" + newFileName.Split('.')[0].Split('_')[4]
+                        + "_" + textBoxEndingMilepostText.Replace(".", "")
+                        +"." + newFileName.Split('.')[1];
+
+            labelFileName.Text = labelFileName.Text.Split(':')[0] + ":" + newFileName;
         }
 
         private void TextBoxBeginningMilepost_KeyPress(object sender, KeyPressEventArgs e)
@@ -1230,13 +1325,14 @@ namespace FileMan
             Label labelFileName = (Label)Controls["panelAddFilePage"].Controls["labelFileName"];
             string textBoxBeginningMilepostText = textBoxBeginningMilepost.Text;
 
-            labelFileName.Text = labelFileName.Text.Split(':')[0] + ":"
-                + labelFileName.Text.Split(':')[1].Split('_')[0]
-                + "_" + labelFileName.Text.Split(':')[1].Split('_')[1]
-                + "_" + labelFileName.Text.Split(':')[1].Split('_')[2]
-                + "_" + labelFileName.Text.Split(':')[1].Split('_')[3]
-                + "_" + "MP" + textBoxBeginningMilepostText.Replace(".", "")
-                + "_" + labelFileName.Text.Split(':')[1].Split('_')[5];
+            newFileName = newFileName.Split('_')[0]
+            + "_" + newFileName.Split('_')[1]
+            + "_" + newFileName.Split('_')[2]
+            + "_" + newFileName.Split('_')[3]
+            + "_" + "MP" + textBoxBeginningMilepostText.Replace(".", "")
+            + "_" + newFileName.Split('_')[5];
+
+            labelFileName.Text = labelFileName.Text.Split(':')[0] + ":" + newFileName;
         }
 
         private void TextBoxFMNumber_KeyPress(object sender, KeyPressEventArgs e)
@@ -1279,13 +1375,15 @@ namespace FileMan
 
             Label labelFileName = (Label)Controls["panelAddFilePage"].Controls["labelFileName"];
 
-            labelFileName.Text = labelFileName.Text.Split(':')[0] + ":"
-                + labelFileName.Text.Split(':')[1].Split('_')[0]
-                + "_" + "SR" + textBoxSR.Text
-                + "_" + labelFileName.Text.Split(':')[1].Split('_')[2]
-                + "_" + labelFileName.Text.Split(':')[1].Split('_')[3]
-                + "_" + labelFileName.Text.Split(':')[1].Split('_')[4]
-                + "_" + labelFileName.Text.Split(':')[1].Split('_')[5];
+            newFileName = newFileName.Split('_')[0]
+                        + "_" + "SR" + textBoxSR.Text
+                        + "_" + newFileName.Split('_')[2]
+                        + "_" + newFileName.Split('_')[3]
+                        + "_" + newFileName.Split('_')[4]
+                        + "_" + newFileName.Split('_')[5];
+
+            labelFileName.Text = labelFileName.Text.Split(':')[0] + ":" + newFileName;
+
         }
 
         private void TextBoxSectionNumber_KeyPress(object sender, KeyPressEventArgs e)
@@ -1309,12 +1407,14 @@ namespace FileMan
 
             Label labelFileName = (Label)Controls["panelAddFilePage"].Controls["labelFileName"];
 
-            labelFileName.Text = labelFileName.Text.Split(':')[0] + ": " + textBoxSectionNumber.Text
-                + "_" + labelFileName.Text.Split(':')[1].Split('_')[1]
-                + "_" + labelFileName.Text.Split(':')[1].Split('_')[2]
-                + "_" + labelFileName.Text.Split(':')[1].Split('_')[3]
-                + "_" + labelFileName.Text.Split(':')[1].Split('_')[4]
-                + "_" + labelFileName.Text.Split(':')[1].Split('_')[5];
+            newFileName = textBoxSectionNumber.Text
+                        + "_" + newFileName.Split('_')[1]
+                        + "_" + newFileName.Split('_')[2]
+                        + "_" + newFileName.Split('_')[3]
+                        + "_" + newFileName.Split('_')[4]
+                        + "_" + newFileName.Split('_')[5];
+
+            labelFileName.Text = labelFileName.Text.Split(':')[0] + ":" + newFileName;
         }
 
         private string getContentFromTextBoxInOnePanel(String panelName, String textBoxName)
@@ -1519,7 +1619,9 @@ namespace FileMan
 
                 Label labelFileName = (Label)Controls["panelAddFilePage"].Controls["labelFileName"];
 
-                labelFileName.Text = labelFileName.Text.Replace("suffix", fileSuffix);
+                newFileName = newFileName.Replace("suffix", fileSuffix);
+                labelFileName.Text = labelFileName.Text.Split(':')[0] + ":" + newFileName;
+
 
                 ///TODO, [PL0219]Here needs to save the new file path, instead of the old one.
                 dOTFileNewSave.FilePathAndName = sSelectedFile;
@@ -1602,7 +1704,7 @@ namespace FileMan
         private void Searchbutton_Click(object sender, EventArgs e)
         {
             Button Searchbutton = (Button)Controls["panelSearchPage"].Controls["Searchbutton"];
-            Searchbutton.Enabled = false;
+            
 
             //[PL0218]Hide advanced search if it is visible.
             Panel panelAdvancedSearch = (Panel)Controls["panelSearchPage"].Controls["panelAdvancedSearch"];
@@ -1616,10 +1718,15 @@ namespace FileMan
             //check the search key word
             if (searchCueTextBox.Text != "")
             {
+                Searchbutton.Enabled = false;
                 PictureBox pictureBoxLoadingIcon = (PictureBox)Controls["panelSearchPage"].Controls["pictureBoxLoadingIcon"];
                 pictureBoxLoadingIcon.Show();
                 pictureBoxLoadingIcon.Update();
                 warningLabel.Text = "";
+
+                autoComplete.Add(searchCueTextBox.Text);
+
+
                 //fill out the query results table
                 //fillDataGridView(dOTQueriedFiles);
                 //[PL0217]Fill the recent search label.
@@ -1869,7 +1976,11 @@ namespace FileMan
 
         private void mainForm_Load(object sender, EventArgs e)
         {
-
+            //[PL0221]For auto fill the text in search box
+            CueTextBox searchCueTextBox = (CueTextBox)Controls["panelSearchPage"].Controls["searchCueTextBox"];
+            searchCueTextBox.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            searchCueTextBox.AutoCompleteSource = AutoCompleteSource.CustomSource;
+            searchCueTextBox.AutoCompleteCustomSource = autoComplete;
         }
 
         private void mainForm_Paint(object sender, PaintEventArgs e)
