@@ -304,7 +304,6 @@ namespace FileMan
         {
             //[PL0217]Create a big panel for all "Search page" components.
             Panel panelSearchPage = createPagePanel("panelSearchPage");
-
             panelSearchPage.Click += PanelSearchPage_Click;
 
             //[PL0217]Add button for advanced search.
@@ -388,14 +387,6 @@ namespace FileMan
             panelSearchPage.Controls.Add(comboBoxChangesInPast);
 
             //[PL0217]Add text info for number of files and folders changed.
-            //Button updatedFilesNumberButton = new Button()
-            //{
-            //    Name = "updatedFilesNumberButton",
-            //    Location = new Point(100, 150),
-            //    Font = new Font("Segoe UI Semibold", 15, FontStyle.Bold)
-            //};
-            //setButtonOutlookAsLabel(updatedFilesNumberButton);
-            //panelSearchPage.Controls.Add(updatedFilesNumberButton);
             Label recentChangeStatisticLabel = new Label()
             {
                 Name = "recentChangeStatisticLabel",
@@ -405,14 +396,6 @@ namespace FileMan
                 Text = " "
             };
             panelSearchPage.Controls.Add(recentChangeStatisticLabel);
-            //Button updatedFolderNumberButton = new Button()
-            //{
-            //    Name = "updatedFolderNumberButton",
-            //    Location = new Point(206, 150),
-            //    Font = new Font("Segoe UI Semibold", 15, FontStyle.Bold)
-            //};
-            //setButtonOutlookAsLabel(updatedFolderNumberButton);
-            //panelSearchPage.Controls.Add(updatedFolderNumberButton);
 
             Label recentSearchLabel = new Label()
             {
@@ -865,7 +848,6 @@ namespace FileMan
             //fill out the query results table
             fillDataGridView(dOTTIFFFiles);
             pictureBoxLoadingIcon.Hide();
-
         }
 
         private void LinkLabelFileType1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -972,7 +954,6 @@ namespace FileMan
                 Controls["panelAddFilePage"].Controls.Add(textBoxContent);
                 labelWarning.Location = new Point(location.X - 2, textBoxContent.Location.Y + 45);
             }
-
         }
 
         private void initAddFilePageComponentsSetup()
@@ -1194,7 +1175,6 @@ namespace FileMan
                 + "_" + newFileName.Split('_')[5];
 
             labelFileName.Text = labelFileName.Text.Split(':')[0] + ":" + newFileName.Replace(" ", "_");
-
         }
 
         private void ComboBoxStudyType_SelectedIndexChanged(object sender, EventArgs e)
@@ -1252,7 +1232,6 @@ namespace FileMan
                 + "_" + newFileName.Split('_')[5];
 
             labelFileName.Text = labelFileName.Text.Split(':')[0] + ":" + newFileName.Replace(" ", "_");
-
         }
 
         private void PanelAddFilePage_Click(object sender, EventArgs e)
@@ -1365,10 +1344,7 @@ namespace FileMan
                 labelSR.ForeColor = Color.Black;
             }
         }
-
-
-
-
+        
         private void TextBoxSR_TextChanged(object sender, EventArgs e)
         {
             TextBox textBoxSR = (TextBox)Controls["panelAddFilePage"].Controls["textBoxSR"];
@@ -1667,10 +1643,6 @@ namespace FileMan
 
             return true;
         }
-        private void cueTextBox1_TextChanged(object sender, EventArgs e)
-        {
-
-        }
 
         private DateTime GetDateTimeConsolidation(DateTimePicker datePicker, DateTimePicker timePicker)
         {
@@ -1703,8 +1675,7 @@ namespace FileMan
         String keywordThird = "";
         private void Searchbutton_Click(object sender, EventArgs e)
         {
-            Button Searchbutton = (Button)Controls["panelSearchPage"].Controls["Searchbutton"];
-            
+            Button Searchbutton = (Button)Controls["panelSearchPage"].Controls["Searchbutton"];            
 
             //[PL0218]Hide advanced search if it is visible.
             Panel panelAdvancedSearch = (Panel)Controls["panelSearchPage"].Controls["panelAdvancedSearch"];
@@ -1725,7 +1696,6 @@ namespace FileMan
                 warningLabel.Text = "";
 
                 autoComplete.Add(searchCueTextBox.Text);
-
 
                 //fill out the query results table
                 //fillDataGridView(dOTQueriedFiles);
@@ -1845,8 +1815,6 @@ namespace FileMan
                 //pictureBoxLoadingIcon.Visible = false;
                 return dOTFiles;
             }
-
-
         }
 
         private DOTFile queryInfoForOneFile(dynamic oneFileXMLContent)
@@ -1923,7 +1891,6 @@ namespace FileMan
 
             dataGridView1.Columns.Add(col);
 
-            //dataGridView1.DataSource = null;
             dataGridView1.DataSource = queriedDataSource;
             if (queriedDataSource.Length > 0)
             {
@@ -1946,33 +1913,6 @@ namespace FileMan
             pictureBoxLoadingIcon.Visible = false;
 
         }
-        //below function is used to change the tableLayoutPanel border color.
-        private void searchResultTableLayoutPanel_CellPaint(object sender, TableLayoutCellPaintEventArgs e)
-        {
-            //    Graphics g = e.Graphics;
-            //    Rectangle r = e.CellBounds;
-
-            //    using (Pen pen = new Pen(Color.CornflowerBlue, 0 /*1px width despite of page scale, dpi, page units*/ ))
-            //    {
-            //        pen.Alignment = System.Drawing.Drawing2D.PenAlignment.Center;
-            //        // define border style
-            //        pen.DashStyle = System.Drawing.Drawing2D.DashStyle.Solid;
-
-            //        // decrease border rectangle height/width by pen's width for last row/column cell
-            //        if (e.Row == (searchResultTableLayoutPanel.RowCount - 1))
-            //        {
-            //            r.Height -= 1;
-            //        }
-
-            //        if (e.Column == (searchResultTableLayoutPanel.ColumnCount - 1))
-            //        {
-            //            r.Width -= 1;
-            //        }
-
-            //        // use graphics mehtods to draw cell's border
-            //        e.Graphics.DrawRectangle(pen, r);
-            //    }
-        }
 
         private void mainForm_Load(object sender, EventArgs e)
         {
@@ -1988,35 +1928,5 @@ namespace FileMan
 
         }
 
-        private void searchResultGroupBox_Paint(object sender, PaintEventArgs e)
-        {
-            Pen pen = new Pen(Color.FromArgb(255, 0, 0, 0));
-            e.Graphics.DrawLine(pen, 17, 60, 718, 60);
-        }
-
-        private void searchResultTableLayoutPanel_MouseClick(object sender, MouseEventArgs e)
-        {
-            //the code is not working when having scrolls
-            //int row = 0;
-            //int verticalOffset = 0;
-            //foreach (int h in searchResultTableLayoutPanel.GetRowHeights())
-            //{
-            //    int column = 0;
-            //    int horizontalOffset = 0;
-            //    foreach (int w in searchResultTableLayoutPanel.GetColumnWidths())
-            //    {
-            //        Rectangle rectangle = new Rectangle(horizontalOffset, verticalOffset, w, h);
-            //        if (rectangle.Contains(e.Location))
-            //        {
-            //            MessageBox.Show(String.Format("row {0}, column {1} was clicked", row, column));
-            //            return;
-            //        }
-            //        horizontalOffset += w;
-            //        column++;
-            //    }
-            //    verticalOffset += h;
-            //    row++;
-            //}
-        }
     }
 }
