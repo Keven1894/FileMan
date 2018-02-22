@@ -1399,15 +1399,21 @@ namespace FileMan
             return foundTextBoxName.Text;
         }
 
+        private string getContentFromComboBoxInOnePanel(String panelName, String comboBoxName)
+        {
+            ColoredCombo foundComboBoxName = (ColoredCombo)Controls[panelName].Controls[comboBoxName];
+            return foundComboBoxName.Text;
+        }
+
         private bool checkIfMandatoryFieldsFilledOut()
         {
             TextBox textBoxSectionNumber = (TextBox)Controls["panelAddFilePage"].Controls["textBoxSectionNumber"];
             TextBox textBoxSR = (TextBox)Controls["panelAddFilePage"].Controls["textBoxSR"];
-            TextBox comboBoxStudyType = (TextBox)Controls["panelAddFilePage"].Controls["comboBoxStudyType"];
-            TextBox comboBoxLocation = (TextBox)Controls["panelAddFilePage"].Controls["comboBoxLocation"];
+            ColoredCombo comboBoxStudyType = (ColoredCombo)Controls["panelAddFilePage"].Controls["comboBoxStudyType"];
+            ColoredCombo comboBoxLocation = (ColoredCombo)Controls["panelAddFilePage"].Controls["comboBoxLocation"];
             TextBox textBoxBeginningMilepost = (TextBox)Controls["panelAddFilePage"].Controls["textBoxBeginningMilepost"];
             TextBox textBoxEndingMilepost = (TextBox)Controls["panelAddFilePage"].Controls["textBoxEndingMilepost"];
-            TextBox textBoxFM = (TextBox)Controls["panelAddFilePage"].Controls["textBoxFM"];
+            TextBox textBoxFMNumber = (TextBox)Controls["panelAddFilePage"].Controls["textBoxFMNumber"];
             TextBox textBoxAuthor = (TextBox)Controls["panelAddFilePage"].Controls["textBoxAuthor"];
             if (textBoxSectionNumber.Text == "")
             {
@@ -1419,14 +1425,14 @@ namespace FileMan
                 MessageBox.Show("State Road (SR) is a mandatory field, please fill it out before save.", "Warning");
                 return false;
             }
-            else if (comboBoxStudyType.Text == "")
+            else if (comboBoxStudyType.Text == "Select")
             {
-                MessageBox.Show("Study Type is a mandatory field, please fill it out before save.", "Warning");
+                MessageBox.Show("Study Type is a mandatory field, please select before save.", "Warning");
                 return false;
             }
-            else if (comboBoxLocation.Text == "")
+            else if (comboBoxLocation.Text == "Select")
             {
-                MessageBox.Show("Location is a mandatory field, please fill it out before save.", "Warning");
+                MessageBox.Show("Location is a mandatory field, please select before save.", "Warning");
                 return false;
             }
             else if (textBoxBeginningMilepost.Text == "")
@@ -1439,7 +1445,7 @@ namespace FileMan
                 MessageBox.Show("Ending Milepost is a mandatory field, please fill it out before save.", "Warning");
                 return false;
             }
-            else if (textBoxFM.Text == "")
+            else if (textBoxFMNumber.Text == "")
             {
                 MessageBox.Show("FM Number is a mandatory field, please fill it out before save.", "Warning");
                 return false;
@@ -1476,8 +1482,8 @@ namespace FileMan
                     //[PL0219]Get file additional properties.
                     dOTFileNewSave.SectionNumber = getContentFromTextBoxInOnePanel("panelAddFilePage", "textBoxSectionNumber");
                     dOTFileNewSave.SR = getContentFromTextBoxInOnePanel("panelAddFilePage", "textBoxSR");
-                    dOTFileNewSave.StudyType = getContentFromTextBoxInOnePanel("panelAddFilePage", "comboBoxStudyType");
-                    dOTFileNewSave.Location = getContentFromTextBoxInOnePanel("panelAddFilePage", "comboBoxLocation");
+                    dOTFileNewSave.StudyType = getContentFromComboBoxInOnePanel("panelAddFilePage", "comboBoxStudyType");
+                    dOTFileNewSave.Location = getContentFromComboBoxInOnePanel("panelAddFilePage", "comboBoxLocation");
                     dOTFileNewSave.BeginningMilepost = getContentFromTextBoxInOnePanel("panelAddFilePage", "textBoxBeginningMilepost");
                     dOTFileNewSave.EndingMilepost = getContentFromTextBoxInOnePanel("panelAddFilePage", "textBoxEndingMilepost");
                     dOTFileNewSave.FM = getContentFromTextBoxInOnePanel("panelAddFilePage", "textBoxFMNumber");
@@ -1601,7 +1607,7 @@ namespace FileMan
 
                 ///TODO, [PL0219]Here needs to save the new file path, instead of the old one.
                 dOTFileNewSave.FilePathAndName = sSelectedFile;
-                dOTFileNewSave.ParentFolder = Path.GetFullPath(sSelectedFile);
+                dOTFileNewSave.ParentFolder = Path.GetDirectoryName(sSelectedFile);
                 ///TODO, [PL0219]Only get the old fileinfo
                 dOTFileNewSave.DateLastAccessed = fileInfo.LastAccessTime.ToString();
                 dOTFileNewSave.DateLastModified = fileInfo.LastWriteTime.ToString();
@@ -1738,6 +1744,8 @@ namespace FileMan
                 FileQueryConditions fileQueryConditions = new FileQueryConditions()
                 {
                     FileName = searchCueTextBox.Text,
+                    Comments = searchCueTextBox.Text,
+                    Keywords = searchCueTextBox.Text,
                     DateCreatedTimeFrom = DateTime.Now.AddDays(1),
                     DateCreatedTimeTo = DateTime.Now
                 };
@@ -1767,7 +1775,9 @@ namespace FileMan
             if (fromDateTime <= toDateTime)
             {
                 var selectedForTextFilter = from cli in root.Elements("row").Elements("var")
-                                            where (string)cli.Attribute("name").Value == "Name" && cli.Attribute("value").Value.ToUpper().Contains(fileNameKeyWord.ToUpper()) == true
+                                            where ((string)cli.Attribute("name").Value == "Name" && cli.Attribute("value").Value.ToUpper().Contains(fileNameKeyWord.ToUpper()) == true)
+                                            || ((string)cli.Attribute("name").Value == "Comments" && cli.Attribute("value").Value.ToUpper().Contains(fileNameKeyWord.ToUpper()) == true)
+                                            || ((string)cli.Attribute("name").Value == "KeyWords" && cli.Attribute("value").Value.ToUpper().Contains(fileNameKeyWord.ToUpper()) == true)
                                             select cli.Parent;
 
                 var selectedForTextFilterAndCreatedFromTime = from cli in selectedForTextFilter.Elements("var")
@@ -1805,7 +1815,9 @@ namespace FileMan
             else
             {
                 var selected = from cli in root.Elements("row").Elements("var")
-                               where (string)cli.Attribute("name").Value == "Name" && cli.Attribute("value").Value.ToUpper().Contains(fileNameKeyWord.ToUpper()) == true
+                               where ((string)cli.Attribute("name").Value == "Name" && cli.Attribute("value").Value.ToUpper().Contains(fileNameKeyWord.ToUpper()) == true)
+                                    || ((string)cli.Attribute("name").Value == "Comments" && cli.Attribute("value").Value.ToUpper().Contains(fileNameKeyWord.ToUpper()) == true)
+                                    || ((string)cli.Attribute("name").Value == "KeyWords" && cli.Attribute("value").Value.ToUpper().Contains(fileNameKeyWord.ToUpper()) == true)
                                select cli.Parent;
                 foreach (var d in selected)
                 {

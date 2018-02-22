@@ -15,6 +15,8 @@ namespace FileMan
         public string SR { get; set; }
         public string StudyType { get; set; }
         public string Description { get; set; }
+        public string Comments { get; set; }
+        public string Keywords { get; set; }
         public DateTime DateCreatedTimeFrom { get; set; }
         public DateTime DateCreatedTimeTo { get; set; }
         public DateTime DateLastAccessedTimeFrom { get; set; }
