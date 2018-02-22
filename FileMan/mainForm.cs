@@ -725,6 +725,10 @@ namespace FileMan
         private void PanelSearchPage_Click(object sender, EventArgs e)
         {
             closeMenu();
+            //[PL0218]Hide advanced search if it is visible.
+            Panel panelAdvancedSearch = (Panel)Controls["panelSearchPage"].Controls["panelAdvancedSearch"];
+            if(panelAdvancedSearch.Visible == true)
+                panelAdvancedSearch.Visible = false;
         }
 
         private void RecentSearchTextBox_TextChanged(object sender, EventArgs e)
