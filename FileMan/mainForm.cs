@@ -23,6 +23,12 @@ namespace FileMan
         //[PL0221]Add the flag to check if the menu is showing
         bool isMenuShowing = false;
 
+        //[PL0222]Set global window width
+        int winformWidth = 1160;
+
+        int buttonAdvancedPostionX = 240;
+        int buttonAdvancedPostionY = 28;
+
         //[PL0221]For auto complete in search textbox
         AutoCompleteStringCollection autoComplete = new AutoCompleteStringCollection();
         public mainForm()
@@ -33,7 +39,7 @@ namespace FileMan
             //backgroundWorker.DoWork += BackgroundWorker_DoWork;
             //backgroundWorker.RunWorkerCompleted += BackgroundWorker_RunWorkerCompleted;
             //this.Size = new Size(816, 854);
-            this.Size = new Size(1000, 954);
+            this.Size = new Size(winformWidth, 954);
             this.BackColor = Color.White;
             //this.ForeColor = ColorTranslator.FromHtml("#ce2b2f");
             //this.FormElement.TitleBar.ForeColor = ColorTranslator.FromHtml("#ce2b2f");
@@ -86,15 +92,27 @@ namespace FileMan
             Button buttonMenuIcon = new Button()
             {
                 Name = "buttonMenuIcon",
-                Location = new Point(0, 0),
+                Location = new Point(10, 14),
                 Font = new Font("Segoe UI Semilight", 24),
-                AutoSize = true,
-                Text = "☰",
+                Size = new Size(25, 25),
+                BackgroundImage = Image.FromFile(@".\assets\img\menu.png"),
+                BackgroundImageLayout = ImageLayout.Stretch,
+                //Text = "☰",
                 FlatStyle = FlatStyle.Flat
             };
             buttonMenuIcon.Click += ButtonMenuIcon_Click;
             buttonMenuIcon.FlatAppearance.BorderSize = 0;
             buttonMenuIcon.FlatAppearance.BorderColor = Color.White;
+
+            Label labelPageTitle = new Label()
+            {
+                Name = "labelPageTitle",
+                Location = new Point(60, 2),
+                Font = new Font("Segoe UI Semilight", 24),
+                AutoSize = true,
+                Text = "Search"
+            };
+            panelMenu.Controls.Add(labelPageTitle);
 
             Label labelRedRectangle = new Label()
             {
@@ -107,11 +125,33 @@ namespace FileMan
             };
             panelMenu.Controls.Add(labelRedRectangle);
 
+            int iconLength = 20;
+
+            Label labelZoomIcon = new Label()
+            {
+                Name = "labelZoomIcon",
+                Size = new Size(iconLength, iconLength),
+                BackgroundImage = Image.FromFile(@".\assets\img\menuZoom.png"),
+                Location = new Point(50, 68),
+                BackgroundImageLayout = ImageLayout.Stretch
+            };
+            panelMenu.Controls.Add(labelZoomIcon);
+
+            Label labelAddFileIcon = new Label()
+            {
+                Name = "labelAddFileIcon",
+                Size = new Size(iconLength, iconLength),
+                BackgroundImage = Image.FromFile(@".\assets\img\menuAddFile.png"),
+                Location = new Point(50, 110),
+                BackgroundImageLayout = ImageLayout.Stretch
+            };
+            panelMenu.Controls.Add(labelAddFileIcon);
+
             Button buttonMenuSearch = new Button()
             {
                 Name = "buttonMenuSearch",
                 Text = "Search",
-                Location = new Point(50, 55),
+                Location = new Point(80, 55),
                 Font = new Font("Segoe UI Semilight", 15),
                 AutoSize = true,
                 FlatStyle = FlatStyle.Flat,
@@ -127,7 +167,7 @@ namespace FileMan
             {
                 Name = "buttonMenuAddFile",
                 Text = "Add File",
-                Location = new Point(50, 100),
+                Location = new Point(80, 100),
                 Font = new Font("Segoe UI Semilight", 15),
                 AutoSize = true,
                 FlatStyle = FlatStyle.Flat,
@@ -146,6 +186,9 @@ namespace FileMan
             buttonMenuSearch.Visible = false;
             buttonMenuAddFile.Visible = false;
             labelRedRectangle.Visible = false;
+            labelAddFileIcon.Visible = false;
+            labelZoomIcon.Visible = false;
+
             this.Controls.Add(panelMenu);
 
             initSearchPageComponentsSetup();
@@ -155,7 +198,7 @@ namespace FileMan
             Label labelFooter = new Label()
             {
                 Text = "About the File Management System | Copyright 2017 \u00A9 FDOT Traffic Operations, District Six",
-                Location = new Point(23, 890),
+                Location = new Point(23 + 13, 890),
                 AutoSize = true,
                 Font = new Font("Segoe UI", 10)
             };
@@ -183,8 +226,8 @@ namespace FileMan
 
             closeMenu();
 
-            Button buttonMenuIcon = (Button)Controls["panelMenu"].Controls["buttonMenuIcon"];
-            buttonMenuIcon.Text = "☰  Add File";
+            Label labelPageTitle = (Label)Controls["panelMenu"].Controls["labelPageTitle"];
+            labelPageTitle.Text = "Add File";
         }
 
         private void ButtonMenuSearch_Click(object sender, EventArgs e)
@@ -196,8 +239,8 @@ namespace FileMan
 
             closeMenu();
 
-            Button buttonMenuIcon = (Button)Controls["panelMenu"].Controls["buttonMenuIcon"];
-            buttonMenuIcon.Text = "☰  Search";
+            Label labelPageTitle = (Label)Controls["panelMenu"].Controls["labelPageTitle"];
+            labelPageTitle.Text = "Search";
 
         }
 
@@ -206,12 +249,16 @@ namespace FileMan
             Button buttonMenuSearch = (Button)Controls["panelMenu"].Controls["buttonMenuSearch"];
             Button buttonMenuAddFile = (Button)Controls["panelMenu"].Controls["buttonMenuAddFile"];
             Label labelRedRectangle = (Label)Controls["panelMenu"].Controls["labelRedRectangle"];
+            Label labelAddFileIcon = (Label)Controls["panelMenu"].Controls["labelAddFileIcon"];
+            Label labelZoomIcon = (Label)Controls["panelMenu"].Controls["labelZoomIcon"];
             Panel panelMenu = (Panel)Controls["panelMenu"];
             if (!isMenuShowing)
             {
                 buttonMenuSearch.Visible = true;
                 buttonMenuAddFile.Visible = true;
                 labelRedRectangle.Visible = true;
+                labelAddFileIcon.Visible = true;
+                labelZoomIcon.Visible = true;
                 panelMenu.Size = new Size(200, 150);
                 panelMenu.BackColor = ColorTranslator.FromHtml("#e5e5e5");
                 isMenuShowing = true;
@@ -221,6 +268,8 @@ namespace FileMan
                 buttonMenuSearch.Visible = false;
                 buttonMenuAddFile.Visible = false;
                 labelRedRectangle.Visible = false;
+                labelAddFileIcon.Visible = false;
+                labelZoomIcon.Visible = false;
                 panelMenu.Size = new Size(200, 50);
                 panelMenu.BackColor = Color.White;
                 isMenuShowing = false;
@@ -294,7 +343,7 @@ namespace FileMan
             {
                 Name = panelName,
                 Location = new Point(23, 80),
-                Size = new Size(999, 800),
+                Size = new Size(winformWidth - 1, 800),
                 BorderStyle = BorderStyle.None
             };
             return panel;
@@ -311,9 +360,10 @@ namespace FileMan
             {
                 Text = "Advanced ▾",
                 Font = new Font("Segoe UI", 12),
-                Location = new Point(200, 25),
-                Size = new Size(93, 40),
-                AutoSize = true
+                Location = new Point(buttonAdvancedPostionX, buttonAdvancedPostionY),
+                Size = new Size(93, 30),
+                AutoSize = true,
+                FlatStyle = FlatStyle.Flat
             };
             buttonAdvanced.Click += ButtonAdvanced_Click;
             panelSearchPage.Controls.Add(buttonAdvanced);
@@ -324,8 +374,8 @@ namespace FileMan
                 Name = "searchCueTextBox",
                 Cue = "Search",
                 Font = new Font("Segoe UI", 15),
-                Location = new Point(307, 28),
-                Size = new Size(435, 30),
+                Location = new Point(370, buttonAdvancedPostionY),
+                Size = new Size(460, 40),
                 TabIndex = 0
             };
             panelSearchPage.Controls.Add(searchCueTextBox);
@@ -347,7 +397,7 @@ namespace FileMan
                 Name = "Searchbutton",
                 BackgroundImage = Image.FromFile(@".\assets\img\zoom.png"),
                 BackgroundImageLayout = ImageLayout.Stretch,
-                Location = new Point(710, 30),
+                Location = new Point(searchCueTextBox.Location.X + 430, 30),
                 Size = new Size(28, 30),
                 FlatStyle = FlatStyle.Flat
             };
@@ -361,7 +411,7 @@ namespace FileMan
             {
                 Text = "Changes in the past:",
                 Font = new Font("Segoe UI Semibold", 15, FontStyle.Bold),
-                Location = new Point(200, 85),
+                Location = new Point(buttonAdvancedPostionX, buttonAdvancedPostionY + 75),
                 AutoSize = true
 
             };
@@ -371,11 +421,12 @@ namespace FileMan
             ColoredCombo comboBoxChangesInPast = new ColoredCombo()
             {
                 Name = "comboBoxChangesInPast",
-                Location = new Point(425, 85),
+                Location = new Point(buttonAdvancedPostionX + 220, buttonAdvancedPostionY + 75),
                 Font = new Font("Segoe UI", 15),
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 BackColor = Color.White,
-                FlatStyle = FlatStyle.Flat
+                FlatStyle = FlatStyle.Flat,
+                Size = new Size(135, 40)
             };
             comboBoxChangesInPast.Items.Add("24 Hours");
             comboBoxChangesInPast.Items.Add("72 Hours");
@@ -386,11 +437,13 @@ namespace FileMan
             comboBoxChangesInPast.SelectedIndexChanged += ComboBoxChangesInPast_SelectedIndexChanged;
             panelSearchPage.Controls.Add(comboBoxChangesInPast);
 
+            int bulletItemStartingPointY = buttonAdvancedPostionY + 146;
+
             //[PL0217]Add text info for number of files and folders changed.
             Label recentChangeStatisticLabel = new Label()
             {
                 Name = "recentChangeStatisticLabel",
-                Location = new Point(200, 150),
+                Location = new Point(buttonAdvancedPostionX, bulletItemStartingPointY),
                 Font = new Font("Segoe UI Semibold", 15, FontStyle.Bold),
                 AutoSize = true,
                 Text = " "
@@ -400,7 +453,7 @@ namespace FileMan
             Label recentSearchLabel = new Label()
             {
                 Name = "recentSearchLabel",
-                Location = new Point(200, 190),
+                Location = new Point(buttonAdvancedPostionX, bulletItemStartingPointY + 42),
                 Font = new Font("Segoe UI Semibold", 15, FontStyle.Bold),
                 AutoSize = true,
                 Text = "⬛  Recent search term: "
@@ -412,7 +465,7 @@ namespace FileMan
                 Name = "recentSearchTextBox",
                 ReadOnly = true,
                 BorderStyle = 0,
-                Location = new Point(421, 190),
+                Location = new Point(buttonAdvancedPostionX + 220, bulletItemStartingPointY + 42),
                 BackColor = Color.White,
                 Font = new Font("Segoe UI Semibold", 15, FontStyle.Bold),
                 TabStop = false
@@ -424,7 +477,7 @@ namespace FileMan
             Label recentFilesLabel = new Label()
             {
                 Name = "recentFilesLabel",
-                Location = new Point(200, 230),
+                Location = new Point(buttonAdvancedPostionX, bulletItemStartingPointY + 84),
                 Font = new Font("Segoe UI Semibold", 15, FontStyle.Bold),
                 AutoSize = true,
                 Text = "⬛  Recent Files..."
@@ -434,7 +487,7 @@ namespace FileMan
             Label totalFileAndFolderInfoLabel = new Label()
             {
                 Name = "totalFileAndFolderInfoLabel",
-                Location = new Point(10, 716),
+                Location = new Point(10, 700),
                 Font = new Font("Segoe UI Semibold", 15, FontStyle.Bold),
                 AutoSize = true,
                 Text = "There are"
@@ -444,8 +497,8 @@ namespace FileMan
             //[PL0218]Add horizontal line
             Panel useAsHorizontalLine = new Panel()
             {
-                Location = new Point(13, 745),
-                Size = new Size(900, 1),
+                Location = new Point(13, 738),
+                Size = new Size(winformWidth - 100, 1),
                 BorderStyle = BorderStyle.FixedSingle,
                 Name = "useAsHorizontalLine"
             };
@@ -499,9 +552,9 @@ namespace FileMan
             DataGridView dataGridView1 = new DataGridView()
             {
                 Name = "dataGridView1",
-                Size = new Size(900, 435),
-                Location = new Point(25, 280),
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+                Size = new Size(winformWidth - 90, 337),
+                Location = new Point(13, 340),
+                //AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
                 AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.None,
                 ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize,
                 Font = new Font("Segoe UI", 10),
@@ -516,8 +569,13 @@ namespace FileMan
             dataGridView1.DataBindingComplete += DataGridView1_DataBindingComplete;
             dataGridView1.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 12);
             dataGridView1.CellClick += DataGridView1_CellClick;
-            dataGridView1.RowTemplate.Height = 30;
+            dataGridView1.RowTemplate.Height = 39;
             panelSearchPage.Controls.Add(dataGridView1);
+
+            for (int i = 0; i < dataGridView1.ColumnCount; i++)
+            {
+                dataGridView1.Columns[i].SortMode = DataGridViewColumnSortMode.NotSortable;
+            }
 
 
             //ProgressBar progressBar = new ProgressBar()
@@ -535,7 +593,7 @@ namespace FileMan
             {
                 Name = "pictureBoxLoadingIcon",
                 Size = new Size(40, 40),
-                Location = new Point(350, 500),
+                Location = new Point(500, 500),
                 Image = Image.FromFile(@".\assets\img\loading.gif"),
 
             };
@@ -545,19 +603,22 @@ namespace FileMan
             //[PL0217]Add panel for advanced search
             Panel panelAdvancedSearch = new Panel()
             {
-                Location = new Point(200, 76),
-                Size = new Size(545, 400),
-                BorderStyle = BorderStyle.FixedSingle,
+                Location = new Point(buttonAdvancedPostionX, 76),
+                Size = new Size(590, 400),
+                BorderStyle = BorderStyle.FixedSingle,        
                 Name = "panelAdvancedSearch",
+                BackColor = ColorTranslator.FromHtml("#e3e3e3")
 
             };
             panelAdvancedSearch.Visible = false;
+
+            int advancedLeftItemPositionX = 25;
 
             //[PL0218]Add components to advanced search panel
             Label documentTitleLabel = new Label()
             {
                 Name = "documentTitleLabel",
-                Location = new Point(10, 20),
+                Location = new Point(advancedLeftItemPositionX, 20),
                 Font = new Font("Segoe UI", 10),
                 AutoSize = true,
                 Text = "Document Title"
@@ -566,7 +627,7 @@ namespace FileMan
             TextBox documentTitleTextBox = new TextBox()
             {
                 Name = "documentTitleTextBox",
-                Location = new Point(10, 40),
+                Location = new Point(advancedLeftItemPositionX + 4, 40),
                 Font = new Font("Segoe UI", 12),
                 Size = new Size(520, 20),
                 AutoSize = true,
@@ -577,7 +638,7 @@ namespace FileMan
             Label fMLabel = new Label()
             {
                 Name = "fMLabel",
-                Location = new Point(10, 80),
+                Location = new Point(advancedLeftItemPositionX, 80),
                 Font = new Font("Segoe UI", 10),
                 AutoSize = true,
                 Text = "Project FM Number (FM)"
@@ -586,9 +647,9 @@ namespace FileMan
             TextBox fMTextBox = new TextBox()
             {
                 Name = "fMTextBox",
-                Location = new Point(10, 100),
+                Location = new Point(advancedLeftItemPositionX + 4, 100),
                 Font = new Font("Segoe UI", 12),
-                Size = new Size(200, 20),
+                Size = new Size(230, 20),
                 AutoSize = true,
                 Text = ""
             };
@@ -597,7 +658,7 @@ namespace FileMan
             Label sRLabel = new Label()
             {
                 Name = "sRLabel",
-                Location = new Point(328, 80),
+                Location = new Point(315, 80),
                 Font = new Font("Segoe UI", 10),
                 AutoSize = true,
                 Text = "State Road (SR)"
@@ -606,9 +667,9 @@ namespace FileMan
             TextBox sRTextBox = new TextBox()
             {
                 Name = "sRTextBox",
-                Location = new Point(328, 100),
+                Location = new Point(315 + 4, 100),
                 Font = new Font("Segoe UI", 12),
-                Size = new Size(200, 20),
+                Size = new Size(230, 20),
                 AutoSize = true,
                 Text = ""
             };
@@ -617,7 +678,7 @@ namespace FileMan
             Label studyTypeLabel = new Label()
             {
                 Name = "studyTypeLabel",
-                Location = new Point(10, 140),
+                Location = new Point(advancedLeftItemPositionX, 140),
                 Font = new Font("Segoe UI", 10),
                 AutoSize = true,
                 Text = "Study Type"
@@ -626,7 +687,7 @@ namespace FileMan
             TextBox studyTypeTextBox = new TextBox()
             {
                 Name = "studyType",
-                Location = new Point(10, 160),
+                Location = new Point(advancedLeftItemPositionX + 4, 160),
                 Font = new Font("Segoe UI", 12),
                 Size = new Size(520, 20),
                 AutoSize = true,
@@ -637,7 +698,7 @@ namespace FileMan
             Label descriptionLabel = new Label()
             {
                 Name = "descriptionLabel",
-                Location = new Point(10, 200),
+                Location = new Point(advancedLeftItemPositionX, 200),
                 Font = new Font("Segoe UI", 10),
                 AutoSize = true,
                 Text = "Description"
@@ -646,7 +707,7 @@ namespace FileMan
             TextBox descriptionTextBox = new TextBox()
             {
                 Name = "descriptionTextBox",
-                Location = new Point(10, 220),
+                Location = new Point(advancedLeftItemPositionX + 4, 220),
                 Font = new Font("Segoe UI", 12),
                 Size = new Size(520, 20),
                 AutoSize = true,
@@ -657,7 +718,7 @@ namespace FileMan
             Label authorLabel = new Label()
             {
                 Name = "authorLabel",
-                Location = new Point(10, 260),
+                Location = new Point(advancedLeftItemPositionX, 260),
                 Font = new Font("Segoe UI", 10),
                 AutoSize = true,
                 Text = "Author"
@@ -666,7 +727,7 @@ namespace FileMan
             TextBox authorTextBox = new TextBox()
             {
                 Name = "authorTextBox",
-                Location = new Point(10, 280),
+                Location = new Point(advancedLeftItemPositionX + 4, 280),
                 Font = new Font("Segoe UI", 12),
                 Size = new Size(520, 20),
                 AutoSize = true,
@@ -677,7 +738,7 @@ namespace FileMan
             Label createdTimeFromLabel = new Label()
             {
                 Name = "createdTimeFromLabel",
-                Location = new Point(10, 320),
+                Location = new Point(advancedLeftItemPositionX, 320),
                 Font = new Font("Segoe UI", 10),
                 AutoSize = true,
                 Text = "From"
@@ -687,7 +748,7 @@ namespace FileMan
             DateTimePicker createdTimeFromDateTimePicker = new DateTimePicker()
             {
                 Name = "createdTimeFromDateTimePicker",
-                Location = new Point(10, 340),
+                Location = new Point(advancedLeftItemPositionX + 4, 340),
                 Font = new Font("Segoe UI", 12),
                 Size = new Size(200, 20)
 
@@ -699,7 +760,7 @@ namespace FileMan
             Label createdTimeToLabel = new Label()
             {
                 Name = "createdTimeToLabel",
-                Location = new Point(328, 320),
+                Location = new Point(345, 320),
                 Font = new Font("Segoe UI", 10),
                 AutoSize = true,
                 Text = "To"
@@ -708,7 +769,7 @@ namespace FileMan
             DateTimePicker createdTimeToDateTimePicker = new DateTimePicker()
             {
                 Name = "createdTimeToDateTimePicker",
-                Location = new Point(328, 340),
+                Location = new Point(345 + 4, 340),
                 Font = new Font("Segoe UI", 12),
                 Size = new Size(200, 20)
             };
@@ -727,9 +788,11 @@ namespace FileMan
             closeMenu();
             //[PL0218]Hide advanced search if it is visible.
             Panel panelAdvancedSearch = (Panel)Controls["panelSearchPage"].Controls["panelAdvancedSearch"];
-            if(panelAdvancedSearch.Visible == true)
+            if (panelAdvancedSearch.Visible == true)
                 panelAdvancedSearch.Visible = false;
         }
+
+
 
         private void RecentSearchTextBox_TextChanged(object sender, EventArgs e)
         {
@@ -741,6 +804,8 @@ namespace FileMan
 
         private void DataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
+            if (e.RowIndex == -1)  // ignore header row
+                return;
             DataGridView dataGridView1 = (DataGridView)Controls["panelSearchPage"].Controls["dataGridView1"];
             DataGridViewCell cell = dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex];
             if (e.ColumnIndex == 0)
@@ -923,7 +988,7 @@ namespace FileMan
             Label labelWarning = new Label()
             {
                 Name = warning,
-                Font = new Font("Seravek", 9, FontStyle.Italic),
+                Font = new Font("Seravek", 10, FontStyle.Italic),
                 AutoSize = true,
                 Text = warning
             };
@@ -934,23 +999,23 @@ namespace FileMan
                 TextBox textBoxContent = new TextBox()
                 {
                     Name = textBoxName,
-                    Location = new Point(location.X, location.Y + 35),
+                    Location = new Point(location.X + 5, location.Y + 35),
                     Font = new Font("Segoe UI", 15),
-                    Size = new Size(380, 20),
+                    Size = new Size(420, 20),
                     AutoSize = true,
                     Text = ""
                 };
                 Controls["panelAddFilePage"].Controls.Add(textBoxContent);
-                labelWarning.Location = new Point(location.X - 2, textBoxContent.Location.Y + 45);
+                labelWarning.Location = new Point(location.X, textBoxContent.Location.Y + 45);
             }
             if (textBoxType == "ComboBox")
             {
                 ColoredCombo textBoxContent = new ColoredCombo()
                 {
                     Name = textBoxName,
-                    Location = new Point(location.X, location.Y + 35),
+                    Location = new Point(location.X + 5, location.Y + 35),
                     Font = new Font("Segoe UI", 15),
-                    Size = new Size(380, 20),
+                    Size = new Size(420, 20),
                     DropDownStyle = ComboBoxStyle.DropDownList,
                     BackColor = Color.White,
                     FlatStyle = FlatStyle.Flat
@@ -966,9 +1031,9 @@ namespace FileMan
             Panel panelAddFilePage = createPagePanel("panelAddFilePage");
             panelAddFilePage.Click += PanelAddFilePage_Click;
 
-            int startingXPoint = 50;
+            int startingXPoint = 80;
             int startingYPoint = 0;
-            int textBoxRightMove = 450;
+            int textBoxRightMove = 520;
             //[PL0217]Add button for advanced search.
             Button buttonSelectFile = new Button()
             {
@@ -979,6 +1044,9 @@ namespace FileMan
                 AutoSize = false,
                 BackColor = Color.FromArgb(0xcccccc)
             };
+            buttonSelectFile.FlatAppearance.BorderSize = 0;
+            buttonSelectFile.FlatAppearance.BorderColor = this.BackColor;
+
             buttonSelectFile.Click += ButtonSelectFile_Click;
             panelAddFilePage.Controls.Add(buttonSelectFile);
 
@@ -989,11 +1057,11 @@ namespace FileMan
                 Location = new Point(startingXPoint + 180, startingYPoint + 5),
                 Font = new Font("Segoe UI", 12),
                 Text = "Path: ",
-                MaximumSize = new Size(520, 0)
-
+                MaximumSize = new Size(780, 0)
 
             };
             linkLabelPath.LinkClicked += LinkLabelPath_LinkClicked;
+            linkLabelPath.LinkArea = new LinkArea(0,0);
             panelAddFilePage.Controls.Add(linkLabelPath);
 
             Label labelInOrderTo = new Label()
@@ -1044,14 +1112,14 @@ namespace FileMan
 
             createSingleSetAdditionalItem("Beginning Milepost", "textBoxBeginningMilepost", "Enter only Milepost digits and double the numbers to avoid errors" + Environment.NewLine + "into the system.", Location = new Point(startingXPoint, startingYPoint + 310), true, "TextBox");
             TextBox textBoxBeginningMilepost = (TextBox)Controls["panelAddFilePage"].Controls["textBoxBeginningMilepost"];
-            textBoxBeginningMilepost.Size = new Size(170, 20);
+            textBoxBeginningMilepost.Size = new Size(180, 20);
             textBoxBeginningMilepost.MaxLength = 6;
             textBoxBeginningMilepost.TextChanged += TextBoxBeginningMilepost_TextChanged;
             textBoxBeginningMilepost.KeyPress += TextBoxBeginningMilepost_KeyPress;
 
-            createSingleSetAdditionalItem("Ending Milepost", "textBoxEndingMilepost", "", Location = new Point(startingXPoint + 210, startingYPoint + 310), true, "TextBox");
+            createSingleSetAdditionalItem("Ending Milepost", "textBoxEndingMilepost", "", Location = new Point(startingXPoint + 240, startingYPoint + 310), true, "TextBox");
             TextBox textBoxEndingMilepost = (TextBox)Controls["panelAddFilePage"].Controls["textBoxEndingMilepost"];
-            textBoxEndingMilepost.Size = new Size(170, 20);
+            textBoxEndingMilepost.Size = new Size(180, 20);
             textBoxEndingMilepost.MaxLength = 6;
             textBoxEndingMilepost.TextChanged += TextBoxEndingMilepost_TextChanged;
             textBoxEndingMilepost.KeyPress += TextBoxEndingMilepost_KeyPress;
@@ -1069,11 +1137,12 @@ namespace FileMan
             {
                 Name = "labelFileName",
                 Font = new Font("Segoe UI Semibold", 15, FontStyle.Bold),
-                Location = new Point(startingXPoint, startingYPoint + 540),
+                Location = new Point(startingXPoint, startingYPoint + 546),
                 AutoSize = false,
                 BackColor = ColorTranslator.FromHtml("#f0bfc0"),
-                Size = new Size(830, 30),
-                Text = "File Name: " + newFileName
+                Size = new Size(946, 40),
+                Text = "  File Name: " + newFileName,
+                TextAlign = ContentAlignment.MiddleLeft
             };
             panelAddFilePage.Controls.Add(labelFileName);
 
@@ -1081,8 +1150,10 @@ namespace FileMan
             {
                 Name = "linkLabelFileNameStructure",
                 Font = new Font("Seravek", 8, FontStyle.Italic),
-                Location = new Point(startingXPoint + 701, startingYPoint + 575),
+                Location = new Point(startingXPoint + 816, startingYPoint + 589),
                 AutoSize = true,
+                ForeColor = Color.Red,
+                LinkColor = Color.Red,
                 Text = "About File Name Structure."
             };
             panelAddFilePage.Controls.Add(linkLabelFileNameStructure);
@@ -1091,7 +1162,7 @@ namespace FileMan
             {
                 Name = "labelFileInfo",
                 Font = new Font("Segoe UI", 15),
-                Location = new Point(startingXPoint, startingYPoint + 585),
+                Location = new Point(startingXPoint, startingYPoint + 600),
                 AutoSize = true,
                 Text = "File Info"
             };
@@ -1101,18 +1172,18 @@ namespace FileMan
             {
                 Name = "labelFileInfoContent",
                 Font = new Font("Segoe UI", 11),
-                Location = new Point(startingXPoint, startingYPoint + 620),
+                Location = new Point(startingXPoint, labelFileInfo.Location.Y + 35),
                 AutoSize = false,
                 BackColor = ColorTranslator.FromHtml("#f2f2f2"),
-                Size = new Size(380, 130),
-                Text = "File Info Details..."
+                Size = new Size(420, 130),
+                Text = " File Info Details..."
             };
             panelAddFilePage.Controls.Add(labelFileInfoContent);
 
-            createSingleSetAdditionalItem("Comments", "textBoxComments", "Add important comments related to the study.", Location = new Point(startingXPoint + textBoxRightMove, startingYPoint + 585), false, "TextBox");
+            createSingleSetAdditionalItem("Comments", "textBoxComments", "Add important comments related to the study.", Location = new Point(startingXPoint + textBoxRightMove, startingYPoint + 600), false, "TextBox");
             TextBox textBoxComments = (TextBox)Controls["panelAddFilePage"].Controls["textBoxComments"];
             textBoxComments.Multiline = true;
-            textBoxComments.Size = new Size(380, 80);
+            textBoxComments.Size = new Size(420, 90);
             Label labelComments = (Label)Controls["panelAddFilePage"].Controls["Add important comments related to the study."];
             labelComments.Location = new Point(textBoxComments.Location.X - 2, textBoxComments.Location.Y + 95);
 
@@ -1120,7 +1191,7 @@ namespace FileMan
             {
                 Name = "labelRequiredFieldStar",
                 Font = new Font("Segoe UI", 12),
-                Location = new Point(startingXPoint, startingYPoint + 760),
+                Location = new Point(startingXPoint, labelFileInfo.Location.Y + 175),
                 AutoSize = true,
                 ForeColor = Color.Red,
                 Text = "*"
@@ -1131,7 +1202,7 @@ namespace FileMan
             {
                 Name = "labelRequiredField",
                 Font = new Font("Segoe UI", 12),
-                Location = new Point(startingXPoint + 13, startingYPoint + 760),
+                Location = new Point(startingXPoint + 13, labelFileInfo.Location.Y + 175),
                 AutoSize = true,
                 Text = "Required Field"
             };
@@ -1141,12 +1212,13 @@ namespace FileMan
             {
                 Name = "buttonSave",
                 Font = new Font("Segoe UI", 15),
-                Location = new Point(startingXPoint + 712, startingYPoint + 740),
+                Location = new Point(startingXPoint + 712 + 114, startingYPoint + 755),
                 Size = new Size(120, 40),
                 AutoSize = false,
                 Text = "Save",
                 BackColor = Color.FromArgb(0xcccccc)
             };
+            buttonSave.FlatAppearance.BorderSize = 0;
             buttonSave.Click += ButtonSave_Click;
             panelAddFilePage.Controls.Add(buttonSave);
         }
@@ -1276,7 +1348,7 @@ namespace FileMan
                         + "_" + newFileName.Split('.')[0].Split('_')[3]
                         + "_" + newFileName.Split('.')[0].Split('_')[4]
                         + "_" + textBoxEndingMilepostText.Replace(".", "")
-                        +"." + newFileName.Split('.')[1];
+                        + "." + newFileName.Split('.')[1];
 
             labelFileName.Text = labelFileName.Text.Split(':')[0] + ":" + newFileName;
         }
@@ -1348,7 +1420,7 @@ namespace FileMan
                 labelSR.ForeColor = Color.Black;
             }
         }
-        
+
         private void TextBoxSR_TextChanged(object sender, EventArgs e)
         {
             TextBox textBoxSR = (TextBox)Controls["panelAddFilePage"].Controls["textBoxSR"];
@@ -1539,7 +1611,8 @@ namespace FileMan
 
         private void LinkLabelPath_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            //throw new NotImplementedException();
+            LinkLabel linkLabelPath = (LinkLabel)Controls["panelAddFilePage"].Controls["linkLabelPath"];
+            Process.Start(Path.GetDirectoryName(linkLabelPath.Text.ToString().Substring(6)));
         }
 
         private string getFileSizeHumanReadable(long fileLength)
@@ -1571,6 +1644,7 @@ namespace FileMan
                 sSelectedFile = choofdlog.FileName;
                 LinkLabel linkLabelPath = (LinkLabel)Controls["panelAddFilePage"].Controls["linkLabelPath"];
                 linkLabelPath.Text += sSelectedFile;
+                linkLabelPath.LinkArea = new LinkArea(6, linkLabelPath.Text.Length - 1);
                 Label labelFileInfoContent = (Label)Controls["panelAddFilePage"].Controls["labelFileInfoContent"];
                 FileInfo fileInfo = new FileInfo(sSelectedFile);
                 string fileSuffix = Path.GetFileName(sSelectedFile).Split('.').Last();
@@ -1685,7 +1759,7 @@ namespace FileMan
         String keywordThird = "";
         private void Searchbutton_Click(object sender, EventArgs e)
         {
-            Button Searchbutton = (Button)Controls["panelSearchPage"].Controls["Searchbutton"];            
+            Button Searchbutton = (Button)Controls["panelSearchPage"].Controls["Searchbutton"];
 
             //[PL0218]Hide advanced search if it is visible.
             Panel panelAdvancedSearch = (Panel)Controls["panelSearchPage"].Controls["panelAdvancedSearch"];
@@ -1857,6 +1931,8 @@ namespace FileMan
             dOTFile.Author = queryInfoForFileAttribute(fileAttributes, "Author");
             dOTFile.KeyWords = queryInfoForFileAttribute(fileAttributes, "KeyWords");
             dOTFile.Comments = queryInfoForFileAttribute(fileAttributes, "Comments");
+            dOTFile.Edit = queryInfoForFileAttribute(fileAttributes, "Edit");
+            dOTFile.MP = queryInfoForFileAttribute(fileAttributes, "MP");
             return dOTFile;
         }
 
@@ -1886,16 +1962,19 @@ namespace FileMan
                 i.StudyType,
                 i.Comments,
                 i.KeyWords,
+                i.BeginningMilepost,
                 i.FM,
                 i.SR,
                 i.Author,
-                Ext = (String)i.Name.Split('.').Last()
+                Ext = (String)i.Name.Split('.').Last(),
+                i.DateLastModified,
+                i.Edit
             }).ToArray();
             DataGridView dataGridView1 = (DataGridView)Controls["panelSearchPage"].Controls["dataGridView1"];
             dataGridView1.Refresh();
             dataGridView1.DataSource = null;
 
-            DataGridViewLinkColumn col = new DataGridViewLinkColumn()
+            DataGridViewLinkColumn colLinkName = new DataGridViewLinkColumn()
             {
                 DataPropertyName = "Name",
                 Name = "fileName",
@@ -1905,21 +1984,59 @@ namespace FileMan
                 VisitedLinkColor = Color.YellowGreen
             };
 
-            dataGridView1.Columns.Add(col);
+            dataGridView1.Columns.Add(colLinkName);
+
+            DataGridViewLinkColumn colEdit = new DataGridViewLinkColumn()
+            {
+                DataPropertyName = "Edit",
+                Name = "colEdit",
+                HeaderText = "EDIT",
+                TrackVisitedState = true,
+                ActiveLinkColor = Color.White,
+                VisitedLinkColor = Color.YellowGreen
+            };
+            dataGridView1.Columns.Add(colEdit);
+
+
 
             dataGridView1.DataSource = queriedDataSource;
+            dataGridView1.Columns["colEdit"].DisplayIndex = 12;
+            //DataGridViewLinkColumn colEDIT = new DataGridViewLinkColumn()
+            //{
+            //    Name = "colEDIT",
+            //    HeaderText = "EDIT",
+            //    TrackVisitedState = true,
+            //    ActiveLinkColor = Color.White,
+            //    VisitedLinkColor = Color.YellowGreen
+            //};
+
+            //dataGridView1.Columns.Add(colEDIT);
+
+            dataGridView1.Columns[1].HeaderText = "Path";
+            dataGridView1.Columns[3].HeaderText = "StudyType";
+            dataGridView1.Columns[6].HeaderText = "MP";
+            dataGridView1.Columns[7].HeaderText = "FM No.";
+            dataGridView1.Columns[6].HeaderText = "MP";
+            dataGridView1.Columns[11].HeaderText = "DateModified";
+
+            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.ColumnHeader;
+            //dataGridView1.AutoResizeColumns();
+
+
             if (queriedDataSource.Length > 0)
             {
-                dataGridView1.Columns[0].Width = 120;
-                dataGridView1.Columns[1].Width = 120;
-                dataGridView1.Columns[2].Width = 60;
-                dataGridView1.Columns[3].Width = 60;
-                dataGridView1.Columns[4].Width = 60;
-                dataGridView1.Columns[5].Width = 60;
-                dataGridView1.Columns[6].Width = 60;
-                dataGridView1.Columns[7].Width = 40;
-                dataGridView1.Columns[8].Width = 50;
-                dataGridView1.Columns[9].Width = 30;
+                dataGridView1.Columns[0].Width = 100;
+                dataGridView1.Columns[1].Width = 100;
+                //dataGridView1.Columns[2].Width = 20;
+                //dataGridView1.Columns[3].Width = 20;
+                //dataGridView1.Columns[4].Width = 20;
+                //dataGridView1.Columns[5].Width = 20;
+                //dataGridView1.Columns[6].Width = 20;
+                //dataGridView1.Columns[7].Width = 20;
+                //dataGridView1.Columns[8].Width = 20;
+                //dataGridView1.Columns[9].Width = 20;
+                dataGridView1.Columns[10].Width = 35;
+                //dataGridView1.Columns[11].Width = 20;
 
                 dataGridView1.Rows[0].Cells[0].Selected = false;
             }
